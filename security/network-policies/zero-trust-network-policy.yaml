@@ -1,0 +1,322 @@
+# Kubernetes Network Policies for Zero Trust Architecture
+# Enterprise Fortune 10 Global Military Network Segmentation
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: zero-trust-default-deny
+  namespace: enterprise-production
+  labels:
+    security.fortune10.com/policy-type: "zero-trust"
+    security.fortune10.com/compliance: "nist-800-53-high"
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+  # Default deny all - Zero Trust principle
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-zero-trust-policy
+  namespace: enterprise-production
+  labels:
+    security.fortune10.com/service: "backend"
+    security.fortune10.com/policy-type: "zero-trust"
+spec:
+  podSelector:
+    matchLabels:
+      app: backend
+      security.fortune10.com/clearance: "secret"
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Only allow mTLS connections from admin-panel
+    - from:
+        - podSelector:
+            matchLabels:
+              app: admin-panel
+              security.fortune10.com/clearance: "secret"
+      ports:
+        - protocol: TCP
+          port: 3001
+    # Allow monitoring from authorized monitoring agents
+    - from:
+        - podSelector:
+            matchLabels:
+              app: prometheus
+              security.fortune10.com/clearance: "confidential"
+      ports:
+        - protocol: TCP
+          port: 9090
+  egress:
+    # Allow egress to PostgreSQL database
+    - to:
+        - podSelector:
+            matchLabels:
+              app: postgres
+              security.fortune10.com/clearance: "secret"
+      ports:
+        - protocol: TCP
+          port: 5432
+    # Allow egress to Redis cache
+    - to:
+        - podSelector:
+            matchLabels:
+              app: redis
+              security.fortune10.com/clearance: "confidential"
+      ports:
+        - protocol: TCP
+          port: 6379
+    # DNS resolution (required)
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: admin-panel-zero-trust-policy
+  namespace: enterprise-production
+  labels:
+    security.fortune10.com/service: "admin-panel"
+    security.fortune10.com/policy-type: "zero-trust"
+spec:
+  podSelector:
+    matchLabels:
+      app: admin-panel
+      security.fortune10.com/clearance: "secret"
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Only allow connections from authenticated load balancer
+    - from:
+        - podSelector:
+            matchLabels:
+              app: istio-proxy
+              security.fortune10.com/role: "ingress"
+      ports:
+        - protocol: TCP
+          port: 3000
+  egress:
+    # Allow egress to backend API
+    - to:
+        - podSelector:
+            matchLabels:
+              app: backend
+              security.fortune10.com/clearance: "secret"
+      ports:
+        - protocol: TCP
+          port: 3001
+    # DNS resolution
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: database-zero-trust-policy
+  namespace: enterprise-production
+  labels:
+    security.fortune10.com/service: "postgres"
+    security.fortune10.com/policy-type: "zero-trust"
+    security.fortune10.com/data-classification: "secret"
+spec:
+  podSelector:
+    matchLabels:
+      app: postgres
+      security.fortune10.com/clearance: "secret"
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Only allow connections from authorized backend services
+    - from:
+        - podSelector:
+            matchLabels:
+              app: backend
+              security.fortune10.com/clearance: "secret"
+      ports:
+        - protocol: TCP
+          port: 5432
+    # Allow monitoring from database monitoring tools
+    - from:
+        - podSelector:
+            matchLabels:
+              app: postgres-exporter
+              security.fortune10.com/clearance: "confidential"
+      ports:
+        - protocol: TCP
+          port: 9187
+  egress:
+    # Minimal egress - databases should be isolated
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53  # DNS only
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: monitoring-zero-trust-policy
+  namespace: enterprise-production
+  labels:
+    security.fortune10.com/service: "monitoring"
+    security.fortune10.com/policy-type: "zero-trust"
+spec:
+  podSelector:
+    matchLabels:
+      app: prometheus
+      security.fortune10.com/clearance: "confidential"
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow access from Grafana dashboards
+    - from:
+        - podSelector:
+            matchLabels:
+              app: grafana
+              security.fortune10.com/clearance: "confidential"
+      ports:
+        - protocol: TCP
+          port: 9090
+    # Allow access from authorized monitoring clients
+    - from:
+        - podSelector:
+            matchLabels:
+              security.fortune10.com/role: "monitoring-client"
+              security.fortune10.com/clearance: "confidential"
+      ports:
+        - protocol: TCP
+          port: 9090
+  egress:
+    # Allow monitoring data collection from all services
+    - to:
+        - podSelector:
+            matchLabels:
+              security.fortune10.com/monitoring: "enabled"
+      ports:
+        - protocol: TCP
+          port: 9090
+        - protocol: TCP
+          port: 9100  # Node exporter
+        - protocol: TCP
+          port: 9187  # PostgreSQL exporter
+    # DNS resolution
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+
+---
+# Enterprise Security Zone Policies
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dmz-zone-policy
+  namespace: enterprise-dmz
+  labels:
+    security.fortune10.com/zone: "dmz"
+    security.fortune10.com/policy-type: "zone-isolation"
+spec:
+  podSelector:
+    matchLabels:
+      security.fortune10.com/zone: "dmz"
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow ingress from internet (controlled by WAF)
+    - from: []
+      ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 443
+  egress:
+    # Only allow egress to internal production zone
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              security.fortune10.com/zone: "internal"
+      ports:
+        - protocol: TCP
+          port: 443
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: internal-zone-policy
+  namespace: enterprise-internal
+  labels:
+    security.fortune10.com/zone: "internal"
+    security.fortune10.com/policy-type: "zone-isolation"
+spec:
+  podSelector:
+    matchLabels:
+      security.fortune10.com/zone: "internal"
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow ingress from DMZ zone only
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              security.fortune10.com/zone: "dmz"
+  egress:
+    # Allow egress to secure zone for database access
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              security.fortune10.com/zone: "secure"
+      ports:
+        - protocol: TCP
+          port: 5432
+        - protocol: TCP
+          port: 6379
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: secure-zone-policy
+  namespace: enterprise-secure
+  labels:
+    security.fortune10.com/zone: "secure"
+    security.fortune10.com/policy-type: "zone-isolation"
+    security.fortune10.com/data-classification: "secret"
+spec:
+  podSelector:
+    matchLabels:
+      security.fortune10.com/zone: "secure"
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Only allow ingress from internal zone
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              security.fortune10.com/zone: "internal"
+        - podSelector:
+            matchLabels:
+              security.fortune10.com/clearance: "secret"
+  egress:
+    # Minimal egress for secure zone
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53  # DNS only

@@ -1,0 +1,86 @@
+{
+  "api": {
+    "welcome": "Welcome to Enterprise++++ Fortune 10 Global Military API",
+    "unauthorized": "Unauthorized access",
+    "forbidden": "Access forbidden",
+    "not_found": "Resource not found",
+    "internal_error": "Internal server error",
+    "validation_error": "Validation error",
+    "rate_limit": "Rate limit exceeded",
+    "maintenance": "System under maintenance"
+  },
+  "auth": {
+    "login_success": "Login successful",
+    "logout_success": "Logout successful",
+    "invalid_credentials": "Invalid email or password",
+    "account_locked": "Account temporarily locked",
+    "password_expired": "Password has expired",
+    "token_expired": "Authentication token has expired",
+    "insufficient_permissions": "Insufficient permissions for this operation",
+    "session_expired": "Session has expired, please login again"
+  },
+  "users": {
+    "created": "User created successfully",
+    "updated": "User updated successfully",
+    "deleted": "User deleted successfully",
+    "not_found": "User not found",
+    "email_exists": "Email already exists",
+    "username_exists": "Username already exists",
+    "invalid_role": "Invalid user role",
+    "cannot_delete_self": "Cannot delete your own account",
+    "password_changed": "Password changed successfully"
+  },
+  "security": {
+    "threat_detected": "Security threat detected",
+    "access_denied": "Access denied - security violation",
+    "suspicious_activity": "Suspicious activity detected",
+    "encryption_enabled": "Data encryption enabled",
+    "audit_log_created": "Security audit log created",
+    "compliance_check": "Compliance check completed",
+    "zero_trust_verified": "Zero trust verification successful",
+    "mfa_required": "Multi-factor authentication required"
+  },
+  "compliance": {
+    "gdpr_consent": "GDPR consent recorded",
+    "data_processed": "Personal data processed according to privacy policy",
+    "retention_policy": "Data retention policy applied",
+    "right_to_deletion": "Right to deletion request processed",
+    "data_export": "Personal data export completed",
+    "privacy_notice": "Privacy notice updated",
+    "consent_withdrawn": "Consent withdrawn successfully",
+    "lawful_basis": "Lawful basis for processing established"
+  },
+  "monitoring": {
+    "system_healthy": "System health check passed",
+    "performance_optimal": "System performance optimal",
+    "alert_created": "Monitoring alert created",
+    "metric_recorded": "Performance metric recorded",
+    "threshold_exceeded": "Performance threshold exceeded",
+    "backup_completed": "System backup completed successfully",
+    "failover_initiated": "Failover process initiated",
+    "recovery_completed": "System recovery completed"
+  },
+  "enterprise": {
+    "sla_maintained": "Service Level Agreement maintained",
+    "uptime_target_met": "Uptime target achieved",
+    "disaster_recovery": "Disaster recovery procedures activated",
+    "business_continuity": "Business continuity plan executed",
+    "global_deployment": "Global deployment synchronized",
+    "multi_region_active": "Multi-region deployment active",
+    "enterprise_ready": "Enterprise-grade infrastructure ready",
+    "military_grade": "Military-grade security protocols active"
+  },
+  "validation": {
+    "required_field": "This field is required",
+    "invalid_email": "Please provide a valid email address",
+    "password_too_short": "Password must be at least 8 characters long",
+    "password_requirements": "Password must contain uppercase, lowercase, number and special character",
+    "invalid_phone": "Please provide a valid phone number",
+    "invalid_date": "Please provide a valid date",
+    "invalid_format": "Invalid format provided",
+    "min_length": "Minimum length is {min} characters",
+    "max_length": "Maximum length is {max} characters",
+    "numeric_only": "Only numeric values are allowed",
+    "alphanumeric_only": "Only alphanumeric characters are allowed"
+  }
+}

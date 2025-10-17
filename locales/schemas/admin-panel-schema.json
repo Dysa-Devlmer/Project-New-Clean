@@ -1,0 +1,262 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Enterprise++++ Fortune 10 Global Military Admin Panel i18n Schema",
+  "description": "JSON Schema for validating admin panel translation files to ensure Enterprise-grade completeness",
+  "type": "object",
+  "properties": {
+    "common": {
+      "type": "object",
+      "properties": {
+        "loading": { "type": "string", "minLength": 1 },
+        "error": { "type": "string", "minLength": 1 },
+        "success": { "type": "string", "minLength": 1 },
+        "save": { "type": "string", "minLength": 1 },
+        "cancel": { "type": "string", "minLength": 1 },
+        "delete": { "type": "string", "minLength": 1 },
+        "edit": { "type": "string", "minLength": 1 },
+        "create": { "type": "string", "minLength": 1 },
+        "update": { "type": "string", "minLength": 1 },
+        "confirm": { "type": "string", "minLength": 1 },
+        "back": { "type": "string", "minLength": 1 },
+        "next": { "type": "string", "minLength": 1 },
+        "previous": { "type": "string", "minLength": 1 },
+        "search": { "type": "string", "minLength": 1 },
+        "filter": { "type": "string", "minLength": 1 },
+        "clear": { "type": "string", "minLength": 1 },
+        "export": { "type": "string", "minLength": 1 },
+        "import": { "type": "string", "minLength": 1 },
+        "refresh": { "type": "string", "minLength": 1 },
+        "settings": { "type": "string", "minLength": 1 },
+        "language": { "type": "string", "minLength": 1 },
+        "timezone": { "type": "string", "minLength": 1 },
+        "currency": { "type": "string", "minLength": 1 },
+        "region": { "type": "string", "minLength": 1 }
+      },
+      "required": ["loading", "error", "success", "save", "cancel", "delete", "edit", "create", "update", "confirm", "back", "next", "previous", "search", "filter", "clear", "export", "import", "refresh", "settings", "language", "timezone", "currency", "region"],
+      "additionalProperties": false
+    },
+    "navigation": {
+      "type": "object",
+      "properties": {
+        "dashboard": { "type": "string", "minLength": 1 },
+        "users": { "type": "string", "minLength": 1 },
+        "reports": { "type": "string", "minLength": 1 },
+        "analytics": { "type": "string", "minLength": 1 },
+        "compliance": { "type": "string", "minLength": 1 },
+        "security": { "type": "string", "minLength": 1 },
+        "monitoring": { "type": "string", "minLength": 1 },
+        "logs": { "type": "string", "minLength": 1 },
+        "alerts": { "type": "string", "minLength": 1 },
+        "settings": { "type": "string", "minLength": 1 },
+        "profile": { "type": "string", "minLength": 1 },
+        "logout": { "type": "string", "minLength": 1 }
+      },
+      "required": ["dashboard", "users", "reports", "analytics", "compliance", "security", "monitoring", "logs", "alerts", "settings", "profile", "logout"],
+      "additionalProperties": false
+    },
+    "auth": {
+      "type": "object",
+      "properties": {
+        "login": { "type": "string", "minLength": 1 },
+        "logout": { "type": "string", "minLength": 1 },
+        "register": { "type": "string", "minLength": 1 },
+        "forgot_password": { "type": "string", "minLength": 1 },
+        "reset_password": { "type": "string", "minLength": 1 },
+        "email": { "type": "string", "minLength": 1 },
+        "password": { "type": "string", "minLength": 1 },
+        "confirm_password": { "type": "string", "minLength": 1 },
+        "remember_me": { "type": "string", "minLength": 1 },
+        "sign_in": { "type": "string", "minLength": 1 },
+        "sign_up": { "type": "string", "minLength": 1 },
+        "welcome_back": { "type": "string", "minLength": 1 },
+        "create_account": { "type": "string", "minLength": 1 },
+        "invalid_credentials": { "type": "string", "minLength": 1 },
+        "password_requirements": { "type": "string", "minLength": 1 }
+      },
+      "required": ["login", "logout", "register", "forgot_password", "reset_password", "email", "password", "confirm_password", "remember_me", "sign_in", "sign_up", "welcome_back", "create_account", "invalid_credentials", "password_requirements"],
+      "additionalProperties": false
+    },
+    "dashboard": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "overview": { "type": "string", "minLength": 1 },
+        "key_metrics": { "type": "string", "minLength": 1 },
+        "recent_activity": { "type": "string", "minLength": 1 },
+        "quick_actions": { "type": "string", "minLength": 1 },
+        "system_status": { "type": "string", "minLength": 1 },
+        "performance": { "type": "string", "minLength": 1 },
+        "security_alerts": { "type": "string", "minLength": 1 },
+        "compliance_status": { "type": "string", "minLength": 1 }
+      },
+      "required": ["title", "overview", "key_metrics", "recent_activity", "quick_actions", "system_status", "performance", "security_alerts", "compliance_status"],
+      "additionalProperties": false
+    },
+    "users": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "create_user": { "type": "string", "minLength": 1 },
+        "edit_user": { "type": "string", "minLength": 1 },
+        "user_details": { "type": "string", "minLength": 1 },
+        "username": { "type": "string", "minLength": 1 },
+        "email": { "type": "string", "minLength": 1 },
+        "role": { "type": "string", "minLength": 1 },
+        "status": { "type": "string", "minLength": 1 },
+        "last_login": { "type": "string", "minLength": 1 },
+        "created_at": { "type": "string", "minLength": 1 },
+        "actions": { "type": "string", "minLength": 1 },
+        "active": { "type": "string", "minLength": 1 },
+        "inactive": { "type": "string", "minLength": 1 },
+        "suspended": { "type": "string", "minLength": 1 },
+        "admin": { "type": "string", "minLength": 1 },
+        "user": { "type": "string", "minLength": 1 },
+        "manager": { "type": "string", "minLength": 1 },
+        "viewer": { "type": "string", "minLength": 1 }
+      },
+      "required": ["title", "create_user", "edit_user", "user_details", "username", "email", "role", "status", "last_login", "created_at", "actions", "active", "inactive", "suspended", "admin", "user", "manager", "viewer"],
+      "additionalProperties": false
+    },
+    "compliance": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "gdpr": { "type": "string", "minLength": 1 },
+        "hipaa": { "type": "string", "minLength": 1 },
+        "sox": { "type": "string", "minLength": 1 },
+        "pci_dss": { "type": "string", "minLength": 1 },
+        "iso_27001": { "type": "string", "minLength": 1 },
+        "nist": { "type": "string", "minLength": 1 },
+        "status": { "type": "string", "minLength": 1 },
+        "last_audit": { "type": "string", "minLength": 1 },
+        "next_review": { "type": "string", "minLength": 1 },
+        "compliant": { "type": "string", "minLength": 1 },
+        "non_compliant": { "type": "string", "minLength": 1 },
+        "pending_review": { "type": "string", "minLength": 1 },
+        "remediation_required": { "type": "string", "minLength": 1 }
+      },
+      "required": ["title", "gdpr", "hipaa", "sox", "pci_dss", "iso_27001", "nist", "status", "last_audit", "next_review", "compliant", "non_compliant", "pending_review", "remediation_required"],
+      "additionalProperties": false
+    },
+    "security": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "threat_detection": { "type": "string", "minLength": 1 },
+        "vulnerability_scan": { "type": "string", "minLength": 1 },
+        "access_control": { "type": "string", "minLength": 1 },
+        "encryption": { "type": "string", "minLength": 1 },
+        "audit_logs": { "type": "string", "minLength": 1 },
+        "incident_response": { "type": "string", "minLength": 1 },
+        "risk_assessment": { "type": "string", "minLength": 1 },
+        "security_policies": { "type": "string", "minLength": 1 },
+        "multi_factor_auth": { "type": "string", "minLength": 1 },
+        "zero_trust": { "type": "string", "minLength": 1 }
+      },
+      "required": ["title", "threat_detection", "vulnerability_scan", "access_control", "encryption", "audit_logs", "incident_response", "risk_assessment", "security_policies", "multi_factor_auth", "zero_trust"],
+      "additionalProperties": false
+    },
+    "monitoring": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "uptime": { "type": "string", "minLength": 1 },
+        "response_time": { "type": "string", "minLength": 1 },
+        "error_rate": { "type": "string", "minLength": 1 },
+        "throughput": { "type": "string", "minLength": 1 },
+        "cpu_usage": { "type": "string", "minLength": 1 },
+        "memory_usage": { "type": "string", "minLength": 1 },
+        "disk_usage": { "type": "string", "minLength": 1 },
+        "network_traffic": { "type": "string", "minLength": 1 },
+        "database_performance": { "type": "string", "minLength": 1 },
+        "api_health": { "type": "string", "minLength": 1 }
+      },
+      "required": ["title", "uptime", "response_time", "error_rate", "throughput", "cpu_usage", "memory_usage", "disk_usage", "network_traffic", "database_performance", "api_health"],
+      "additionalProperties": false
+    },
+    "legal": {
+      "type": "object",
+      "properties": {
+        "terms_of_service": { "type": "string", "minLength": 1 },
+        "privacy_policy": { "type": "string", "minLength": 1 },
+        "cookie_policy": { "type": "string", "minLength": 1 },
+        "data_processing": { "type": "string", "minLength": 1 },
+        "gdpr_notice": { "type": "string", "minLength": 1 },
+        "ccpa_notice": { "type": "string", "minLength": 1 },
+        "regional_compliance": { "type": "string", "minLength": 1 },
+        "data_retention": { "type": "string", "minLength": 1 },
+        "right_to_deletion": { "type": "string", "minLength": 1 },
+        "data_portability": { "type": "string", "minLength": 1 }
+      },
+      "required": ["terms_of_service", "privacy_policy", "cookie_policy", "data_processing", "gdpr_notice", "ccpa_notice", "regional_compliance", "data_retention", "right_to_deletion", "data_portability"],
+      "additionalProperties": false
+    },
+    "enterprise": {
+      "type": "object",
+      "properties": {
+        "sla": { "type": "string", "minLength": 1 },
+        "business_continuity": { "type": "string", "minLength": 1 },
+        "disaster_recovery": { "type": "string", "minLength": 1 },
+        "backup_status": { "type": "string", "minLength": 1 },
+        "failover": { "type": "string", "minLength": 1 },
+        "high_availability": { "type": "string", "minLength": 1 },
+        "load_balancing": { "type": "string", "minLength": 1 },
+        "auto_scaling": { "type": "string", "minLength": 1 },
+        "multi_region": { "type": "string", "minLength": 1 },
+        "global_deployment": { "type": "string", "minLength": 1 }
+      },
+      "required": ["sla", "business_continuity", "disaster_recovery", "backup_status", "failover", "high_availability", "load_balancing", "auto_scaling", "multi_region", "global_deployment"],
+      "additionalProperties": false
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "required": { "type": "string", "minLength": 1 },
+        "invalid_email": { "type": "string", "minLength": 1 },
+        "password_too_short": { "type": "string", "minLength": 1 },
+        "passwords_do_not_match": { "type": "string", "minLength": 1 },
+        "invalid_format": { "type": "string", "minLength": 1 },
+        "min_length": { "type": "string", "minLength": 1, "pattern": ".*\\{min\\}.*" },
+        "max_length": { "type": "string", "minLength": 1, "pattern": ".*\\{max\\}.*" },
+        "numeric_only": { "type": "string", "minLength": 1 },
+        "alphanumeric_only": { "type": "string", "minLength": 1 }
+      },
+      "required": ["required", "invalid_email", "password_too_short", "passwords_do_not_match", "invalid_format", "min_length", "max_length", "numeric_only", "alphanumeric_only"],
+      "additionalProperties": false
+    },
+    "errors": {
+      "type": "object",
+      "properties": {
+        "generic": { "type": "string", "minLength": 1 },
+        "network": { "type": "string", "minLength": 1 },
+        "server": { "type": "string", "minLength": 1 },
+        "unauthorized": { "type": "string", "minLength": 1 },
+        "forbidden": { "type": "string", "minLength": 1 },
+        "not_found": { "type": "string", "minLength": 1 },
+        "validation": { "type": "string", "minLength": 1 },
+        "timeout": { "type": "string", "minLength": 1 },
+        "rate_limit": { "type": "string", "minLength": 1 }
+      },
+      "required": ["generic", "network", "server", "unauthorized", "forbidden", "not_found", "validation", "timeout", "rate_limit"],
+      "additionalProperties": false
+    },
+    "success": {
+      "type": "object",
+      "properties": {
+        "created": { "type": "string", "minLength": 1 },
+        "updated": { "type": "string", "minLength": 1 },
+        "deleted": { "type": "string", "minLength": 1 },
+        "saved": { "type": "string", "minLength": 1 },
+        "uploaded": { "type": "string", "minLength": 1 },
+        "downloaded": { "type": "string", "minLength": 1 },
+        "imported": { "type": "string", "minLength": 1 },
+        "exported": { "type": "string", "minLength": 1 },
+        "synchronized": { "type": "string", "minLength": 1 }
+      },
+      "required": ["created", "updated", "deleted", "saved", "uploaded", "downloaded", "imported", "exported", "synchronized"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["common", "navigation", "auth", "dashboard", "users", "compliance", "security", "monitoring", "legal", "enterprise", "validation", "errors", "success"],
+  "additionalProperties": false
+}

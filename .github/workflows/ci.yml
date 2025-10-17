@@ -1,3 +1,5 @@
+# .github/workflows/ci.yml
+
 name: CI/CD Pipeline
 
 on:
@@ -12,6 +14,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
   packages: write
   security-events: write
 
@@ -54,8 +57,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        workspace: ["backend", "admin-panel", "common-logging", "common-types"]
-
+        workspace:
+          - backend
+          - admin-panel
+          - logging
+          - types
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -65,7 +71,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Install root deps
+      - name: Install root dependencies
         run: yarn install --frozen-lockfile
 
       - name: Lint ${{ matrix.workspace }}
@@ -87,11 +93,10 @@ jobs:
           POSTGRES_USER: ${{ env.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
         options: >-
-          --health-cmd="pg_isready -U postgres -d projectnewtest_db"
+          --health-cmd="pg_isready -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }}"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
-
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -116,6 +121,259 @@ jobs:
       - name: Frontend Lint
         run: yarn workspace admin-panel lint
 
+  i18n-validation:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install JSON Schema Validator
+        run: npm install -g ajv-cli
+
+      - name: Validate Admin Panel Locales Schema
+        run: |
+          echo "🌍 Validating Admin Panel Locale Files for Enterprise++++ Fortune 10 Global Military"
+          for locale_file in apps/admin-panel/src/locales/*.json; do
+            if [ -f "$locale_file" ]; then
+              echo "Validating $locale_file..."
+              ajv validate -s locales/schemas/admin-panel-schema.json -d "$locale_file" || exit 1
+            fi
+          done
+
+      - name: Validate Backend i18n Schema
+        run: |
+          echo "🌍 Validating Backend i18n Files for Enterprise++++ Fortune 10 Global Military"
+          for locale_dir in apps/backend/src/i18n/*/; do
+            if [ -d "$locale_dir" ]; then
+              for locale_file in "$locale_dir"*.json; do
+                if [ -f "$locale_file" ]; then
+                  echo "Validating $locale_file..."
+                  ajv validate -s locales/schemas/i18n-schema.json -d "$locale_file" || exit 1
+                fi
+              done
+            fi
+          done
+
+      - name: Check i18n Completeness
+        run: |
+          echo "🔍 Checking i18n Translation Completeness"
+          node -e "
+          const fs = require('fs');
+          const path = require('path');
+
+          // Admin Panel Locales Check
+          const adminLocalesDir = 'apps/admin-panel/src/locales';
+          const adminLocales = fs.readdirSync(adminLocalesDir).filter(f => f.endsWith('.json'));
+
+          if (adminLocales.length === 0) {
+            console.error('❌ No admin panel locale files found');
+            process.exit(1);
+          }
+
+          // Load reference locale (English)
+          const refLocale = JSON.parse(fs.readFileSync(path.join(adminLocalesDir, 'en.json'), 'utf8'));
+
+          // Get all keys from reference locale
+          function getAllKeys(obj, prefix = '') {
+            let keys = [];
+            for (const [key, value] of Object.entries(obj)) {
+              const fullKey = prefix ? \`\${prefix}.\${key}\` : key;
+              if (typeof value === 'object' && value !== null) {
+                keys = keys.concat(getAllKeys(value, fullKey));
+              } else {
+                keys.push(fullKey);
+              }
+            }
+            return keys;
+          }
+
+          const referenceKeys = getAllKeys(refLocale);
+          console.log(\`📊 Reference locale (en) has \${referenceKeys.length} keys\`);
+
+          let hasErrors = false;
+
+          // Check each locale file
+          for (const localeFile of adminLocales) {
+            if (localeFile === 'en.json') continue;
+
+            const localePath = path.join(adminLocalesDir, localeFile);
+            const locale = JSON.parse(fs.readFileSync(localePath, 'utf8'));
+            const localeKeys = getAllKeys(locale);
+
+            const missingKeys = referenceKeys.filter(key => !localeKeys.includes(key));
+            const extraKeys = localeKeys.filter(key => !referenceKeys.includes(key));
+
+            console.log(\`\`);
+            console.log(\`🌐 Checking \${localeFile}: \${localeKeys.length} keys\`);
+
+            if (missingKeys.length > 0) {
+              console.error(\`❌ Missing keys in \${localeFile}:\`);
+              missingKeys.forEach(key => console.error(\`   - \${key}\`));
+              hasErrors = true;
+            }
+
+            if (extraKeys.length > 0) {
+              console.warn(\`⚠️  Extra keys in \${localeFile}:\`);
+              extraKeys.forEach(key => console.warn(\`   + \${key}\`));
+            }
+
+            if (missingKeys.length === 0 && extraKeys.length === 0) {
+              console.log(\`✅ \${localeFile} is complete and valid\`);
+            }
+          }
+
+          // Backend i18n Check
+          const backendI18nDir = 'apps/backend/src/i18n';
+          const backendLocales = fs.readdirSync(backendI18nDir, { withFileTypes: true })
+            .filter(dirent => dirent.isDirectory())
+            .map(dirent => dirent.name);
+
+          if (backendLocales.length === 0) {
+            console.error('❌ No backend i18n locale directories found');
+            process.exit(1);
+          }
+
+          console.log(\`\`);
+          console.log(\`🔧 Backend Locales Found: \${backendLocales.join(', ')}\`);
+
+          if (hasErrors) {
+            console.error('');
+            console.error('❌ i18n validation failed. Please fix missing translations.');
+            console.error('🏛️  Enterprise++++ Fortune 10 Global Military requires complete translations for all supported locales.');
+            process.exit(1);
+          } else {
+            console.log('');
+            console.log('✅ All i18n validations passed!');
+            console.log('🌍 Enterprise++++ Fortune 10 Global Military i18n compliance verified');
+          }
+          "
+
+      - name: Generate i18n Coverage Report
+        run: |
+          echo "📊 Generating i18n Coverage Report"
+          node -e "
+          const fs = require('fs');
+          const path = require('path');
+
+          const report = {
+            timestamp: new Date().toISOString(),
+            enterprise_level: 'Fortune-10-Global-Military',
+            admin_panel: {
+              locales: [],
+              total_keys: 0,
+              coverage: {}
+            },
+            backend: {
+              locales: [],
+              total_keys: 0,
+              coverage: {}
+            }
+          };
+
+          // Admin Panel Analysis
+          const adminLocalesDir = 'apps/admin-panel/src/locales';
+          const adminFiles = fs.readdirSync(adminLocalesDir).filter(f => f.endsWith('.json'));
+
+          if (adminFiles.length > 0) {
+            const refLocale = JSON.parse(fs.readFileSync(path.join(adminLocalesDir, 'en.json'), 'utf8'));
+
+            function countKeys(obj) {
+              let count = 0;
+              for (const value of Object.values(obj)) {
+                if (typeof value === 'object' && value !== null) {
+                  count += countKeys(value);
+                } else {
+                  count++;
+                }
+              }
+              return count;
+            }
+
+            report.admin_panel.total_keys = countKeys(refLocale);
+
+            for (const file of adminFiles) {
+              const locale = file.replace('.json', '');
+              report.admin_panel.locales.push(locale);
+
+              const localeData = JSON.parse(fs.readFileSync(path.join(adminLocalesDir, file), 'utf8'));
+              const localeKeys = countKeys(localeData);
+              const coverage = Math.round((localeKeys / report.admin_panel.total_keys) * 100);
+
+              report.admin_panel.coverage[locale] = {
+                keys: localeKeys,
+                percentage: coverage
+              };
+            }
+          }
+
+          // Backend Analysis
+          const backendI18nDir = 'apps/backend/src/i18n';
+          const backendDirs = fs.readdirSync(backendI18nDir, { withFileTypes: true })
+            .filter(dirent => dirent.isDirectory())
+            .map(dirent => dirent.name);
+
+          if (backendDirs.includes('en')) {
+            const refFile = path.join(backendI18nDir, 'en', 'main.json');
+            if (fs.existsSync(refFile)) {
+              const refLocale = JSON.parse(fs.readFileSync(refFile, 'utf8'));
+
+              function countKeys(obj) {
+                let count = 0;
+                for (const value of Object.values(obj)) {
+                  if (typeof value === 'object' && value !== null) {
+                    count += countKeys(value);
+                  } else {
+                    count++;
+                  }
+                }
+                return count;
+              }
+
+              report.backend.total_keys = countKeys(refLocale);
+
+              for (const dir of backendDirs) {
+                const mainFile = path.join(backendI18nDir, dir, 'main.json');
+                if (fs.existsSync(mainFile)) {
+                  report.backend.locales.push(dir);
+
+                  const localeData = JSON.parse(fs.readFileSync(mainFile, 'utf8'));
+                  const localeKeys = countKeys(localeData);
+                  const coverage = Math.round((localeKeys / report.backend.total_keys) * 100);
+
+                  report.backend.coverage[dir] = {
+                    keys: localeKeys,
+                    percentage: coverage
+                  };
+                }
+              }
+            }
+          }
+
+          // Output report
+          console.log('');
+          console.log('📋 Enterprise++++ Fortune 10 Global Military i18n Coverage Report');
+          console.log('='.repeat(60));
+          console.log(JSON.stringify(report, null, 2));
+
+          // Save report
+          fs.writeFileSync('i18n-coverage-report.json', JSON.stringify(report, null, 2));
+          "
+
+      - name: Upload i18n Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: i18n-coverage-report
+          path: i18n-coverage-report.json
+
   security:
     needs: setup
     runs-on: ubuntu-latest
@@ -123,22 +381,83 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Dependency review
-        uses: docker://ghcr.io/github/codeql-action/review-action:latest
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          review_token: ${{ secrets.GITHUB_TOKEN }}
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: moderate
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v3
         with:
-          languages: javascript
+          languages: javascript-typescript
 
-      - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@v2
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+      - name: Setup Python for Semgrep
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install Semgrep CLI
+        run: pip install semgrep
+
+      - name: Run Semgrep SAST
+        run: |
+          semgrep \
+            --config p/security-audit \
+            --config p/secrets \
+            --config p/typescript \
+            --config p/nodejs \
+            --sarif \
+            --output semgrep-results.sarif .
+
+      - name: Upload Semgrep SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: semgrep-results.sarif
+
+      - name: Run Trivy Vulnerability Scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: sarif
+          output: trivy-results.sarif
+
+      - name: Upload Trivy SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
+
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: spdx-json
+          output-file: sbom.spdx.json
+
+      - name: Upload SBOM Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-${{ github.sha }}
+          path: sbom.spdx.json
 
   docker:
     if: github.ref == 'refs/heads/main'
-    needs: [build, test]
+    needs:
+      - build
+      - test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
@@ -151,7 +470,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build & push backend image
+      - name: Build & Push Backend Image
         uses: docker/build-push-action@v4
         with:
           context: .
@@ -162,7 +481,7 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/project-new-clean-backend:latest
             ghcr.io/${{ github.repository_owner }}/project-new-clean-backend:${{ github.sha }}
 
-      - name: Build & push admin-panel image
+      - name: Build & Push Admin-Panel Image
         uses: docker/build-push-action@v4
         with:
           context: .
@@ -172,3 +491,4 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository_owner }}/project-new-clean-admin-panel:latest
             ghcr.io/${{ github.repository_owner }}/project-new-clean-admin-panel:${{ github.sha }}
+```

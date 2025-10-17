@@ -1,0 +1,86 @@
+{
+  "api": {
+    "welcome": "Bienvenido a Enterprise++++ Fortune 10 Global Military API",
+    "unauthorized": "Acceso no autorizado",
+    "forbidden": "Acceso prohibido",
+    "not_found": "Recurso no encontrado",
+    "internal_error": "Error interno del servidor",
+    "validation_error": "Error de validación",
+    "rate_limit": "Límite de velocidad excedido",
+    "maintenance": "Sistema en mantenimiento"
+  },
+  "auth": {
+    "login_success": "Inicio de sesión exitoso",
+    "logout_success": "Cierre de sesión exitoso",
+    "invalid_credentials": "Email o contraseña inválidos",
+    "account_locked": "Cuenta temporalmente bloqueada",
+    "password_expired": "La contraseña ha expirado",
+    "token_expired": "El token de autenticación ha expirado",
+    "insufficient_permissions": "Permisos insuficientes para esta operación",
+    "session_expired": "La sesión ha expirado, por favor inicie sesión nuevamente"
+  },
+  "users": {
+    "created": "Usuario creado exitosamente",
+    "updated": "Usuario actualizado exitosamente",
+    "deleted": "Usuario eliminado exitosamente",
+    "not_found": "Usuario no encontrado",
+    "email_exists": "El email ya existe",
+    "username_exists": "El nombre de usuario ya existe",
+    "invalid_role": "Rol de usuario inválido",
+    "cannot_delete_self": "No puede eliminar su propia cuenta",
+    "password_changed": "Contraseña cambiada exitosamente"
+  },
+  "security": {
+    "threat_detected": "Amenaza de seguridad detectada",
+    "access_denied": "Acceso denegado - violación de seguridad",
+    "suspicious_activity": "Actividad sospechosa detectada",
+    "encryption_enabled": "Encriptación de datos habilitada",
+    "audit_log_created": "Registro de auditoría de seguridad creado",
+    "compliance_check": "Verificación de cumplimiento completada",
+    "zero_trust_verified": "Verificación de confianza cero exitosa",
+    "mfa_required": "Autenticación multi-factor requerida"
+  },
+  "compliance": {
+    "gdpr_consent": "Consentimiento GDPR registrado",
+    "data_processed": "Datos personales procesados según política de privacidad",
+    "retention_policy": "Política de retención de datos aplicada",
+    "right_to_deletion": "Solicitud de derecho al olvido procesada",
+    "data_export": "Exportación de datos personales completada",
+    "privacy_notice": "Aviso de privacidad actualizado",
+    "consent_withdrawn": "Consentimiento retirado exitosamente",
+    "lawful_basis": "Base legal para procesamiento establecida"
+  },
+  "monitoring": {
+    "system_healthy": "Verificación de salud del sistema aprobada",
+    "performance_optimal": "Rendimiento del sistema óptimo",
+    "alert_created": "Alerta de monitoreo creada",
+    "metric_recorded": "Métrica de rendimiento registrada",
+    "threshold_exceeded": "Umbral de rendimiento excedido",
+    "backup_completed": "Respaldo del sistema completado exitosamente",
+    "failover_initiated": "Proceso de conmutación por error iniciado",
+    "recovery_completed": "Recuperación del sistema completada"
+  },
+  "enterprise": {
+    "sla_maintained": "Acuerdo de Nivel de Servicio mantenido",
+    "uptime_target_met": "Objetivo de tiempo de actividad alcanzado",
+    "disaster_recovery": "Procedimientos de recuperación ante desastres activados",
+    "business_continuity": "Plan de continuidad del negocio ejecutado",
+    "global_deployment": "Despliegue global sincronizado",
+    "multi_region_active": "Despliegue multi-región activo",
+    "enterprise_ready": "Infraestructura de nivel empresarial lista",
+    "military_grade": "Protocolos de seguridad de grado militar activos"
+  },
+  "validation": {
+    "required_field": "Este campo es obligatorio",
+    "invalid_email": "Por favor proporcione una dirección de email válida",
+    "password_too_short": "La contraseña debe tener al menos 8 caracteres",
+    "password_requirements": "La contraseña debe contener mayúscula, minúscula, número y carácter especial",
+    "invalid_phone": "Por favor proporcione un número de teléfono válido",
+    "invalid_date": "Por favor proporcione una fecha válida",
+    "invalid_format": "Formato inválido proporcionado",
+    "min_length": "La longitud mínima es {min} caracteres",
+    "max_length": "La longitud máxima es {max} caracteres",
+    "numeric_only": "Solo se permiten valores numéricos",
+    "alphanumeric_only": "Solo se permiten caracteres alfanuméricos"
+  }
+}

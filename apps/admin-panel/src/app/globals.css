@@ -1,26 +1,148 @@
-@import "tailwindcss";
+/**
+ * Enterprise++++ Fortune 10 Global Military Global Styles
+ *
+ * Comprehensive styling system with internationalization support,
+ * accessibility, dark mode, and enterprise-grade design patterns.
+ */
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Enterprise Root Variables */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Colors - Fortune 10 Global Military Palette */
+  --enterprise-primary: #1e40af;
+  --enterprise-secondary: #7c3aed;
+  --enterprise-accent: #059669;
+  --enterprise-warning: #d97706;
+  --enterprise-danger: #dc2626;
+  --enterprise-success: #16a34a;
+
+  /* Neutral Palette */
+  --enterprise-slate-50: #f8fafc;
+  --enterprise-slate-100: #f1f5f9;
+  --enterprise-slate-200: #e2e8f0;
+  --enterprise-slate-300: #cbd5e1;
+  --enterprise-slate-400: #94a3b8;
+  --enterprise-slate-500: #64748b;
+  --enterprise-slate-600: #475569;
+  --enterprise-slate-700: #334155;
+  --enterprise-slate-800: #1e293b;
+  --enterprise-slate-900: #0f172a;
+
+  /* Typography */
+  --enterprise-font-sans: 'Inter', system-ui, sans-serif;
+  --enterprise-font-mono: 'Fira Code', 'Monaco', 'Cascadia Code', monospace;
+
+  /* Spacing & Layout */
+  --enterprise-container-max: 1440px;
+  --enterprise-sidebar-width: 280px;
+  --enterprise-header-height: 64px;
+
+  /* Animations */
+  --enterprise-transition-fast: 150ms ease-in-out;
+  --enterprise-transition-normal: 300ms ease-in-out;
+  --enterprise-transition-slow: 500ms ease-in-out;
+
+  /* Shadows */
+  --enterprise-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --enterprise-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --enterprise-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --enterprise-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/* Dark Mode Variables */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --enterprise-bg-primary: var(--enterprise-slate-900);
+    --enterprise-bg-secondary: var(--enterprise-slate-800);
+    --enterprise-text-primary: var(--enterprise-slate-100);
+    --enterprise-text-secondary: var(--enterprise-slate-400);
   }
 }
 
+/* Light Mode Variables */
+@media (prefers-color-scheme: light) {
+  :root {
+    --enterprise-bg-primary: var(--enterprise-slate-50);
+    --enterprise-bg-secondary: white;
+    --enterprise-text-primary: var(--enterprise-slate-900);
+    --enterprise-text-secondary: var(--enterprise-slate-600);
+  }
+}
+
+/* Base Styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--enterprise-font-sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* RTL Support for Arabic and other RTL languages */
+[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] .enterprise-layout {
+  direction: rtl;
+}
+
+/* Enterprise Layout Components */
+.enterprise-layout {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--enterprise-bg-primary) 0%, var(--enterprise-bg-secondary) 100%);
+}
+
+/* Enterprise Accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus visible for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid var(--enterprise-primary);
+  outline-offset: 2px;
+}
+
+/* Enterprise Animations */
+@keyframes enterprise-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.enterprise-fade-in {
+  animation: enterprise-fade-in var(--enterprise-transition-normal) ease-out;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
 }

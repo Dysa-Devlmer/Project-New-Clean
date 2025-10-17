@@ -1,0 +1,103 @@
+name: End-to-End Tests
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  checks: write
+
+env:
+  NODE_VERSION: 20
+  POSTGRES_DB: projectnewtest_db
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:15
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        options: >-
+          --health-cmd="pg_isready -U postgres -d projectnewtest_db"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build applications
+        run: |
+          yarn workspace backend build
+          yarn workspace admin-panel build
+
+      - name: Install Playwright
+        run: yarn workspace admin-panel playwright install
+
+      - name: Start backend server
+        run: |
+          yarn workspace backend start:prod &
+          sleep 10
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: ${{ env.POSTGRES_DB }}
+          DB_USER: ${{ env.POSTGRES_USER }}
+          DB_PASS: ${{ env.POSTGRES_PASSWORD }}
+
+      - name: Start admin panel
+        run: |
+          yarn workspace admin-panel start &
+          sleep 10
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:3001
+
+      - name: Wait for services
+        run: |
+          npx wait-on http://localhost:3001/health --timeout 60000
+          npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: Run Playwright tests
+        run: yarn workspace admin-panel test:e2e
+        env:
+          BASE_URL: http://localhost:3000
+          API_URL: http://localhost:3001
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-test-results
+          path: |
+            apps/admin-panel/test-results/
+            apps/admin-panel/playwright-report/
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-coverage
+          path: apps/admin-panel/coverage/

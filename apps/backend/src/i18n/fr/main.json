@@ -1,0 +1,86 @@
+{
+  "api": {
+    "welcome": "Bienvenue dans l'API Enterprise++++ Fortune 10 Global Military",
+    "unauthorized": "Accès non autorisé",
+    "forbidden": "Accès interdit",
+    "not_found": "Ressource non trouvée",
+    "internal_error": "Erreur interne du serveur",
+    "validation_error": "Erreur de validation",
+    "rate_limit": "Limite de taux dépassée",
+    "maintenance": "Système en maintenance"
+  },
+  "auth": {
+    "login_success": "Connexion réussie",
+    "logout_success": "Déconnexion réussie",
+    "invalid_credentials": "Email ou mot de passe invalide",
+    "account_locked": "Compte temporairement verrouillé",
+    "password_expired": "Le mot de passe a expiré",
+    "token_expired": "Le jeton d'authentification a expiré",
+    "insufficient_permissions": "Permissions insuffisantes pour cette opération",
+    "session_expired": "La session a expiré, veuillez vous reconnecter"
+  },
+  "users": {
+    "created": "Utilisateur créé avec succès",
+    "updated": "Utilisateur mis à jour avec succès",
+    "deleted": "Utilisateur supprimé avec succès",
+    "not_found": "Utilisateur non trouvé",
+    "email_exists": "L'email existe déjà",
+    "username_exists": "Le nom d'utilisateur existe déjà",
+    "invalid_role": "Rôle d'utilisateur invalide",
+    "cannot_delete_self": "Impossible de supprimer votre propre compte",
+    "password_changed": "Mot de passe changé avec succès"
+  },
+  "security": {
+    "threat_detected": "Menace de sécurité détectée",
+    "access_denied": "Accès refusé - violation de sécurité",
+    "suspicious_activity": "Activité suspecte détectée",
+    "encryption_enabled": "Chiffrement des données activé",
+    "audit_log_created": "Journal d'audit de sécurité créé",
+    "compliance_check": "Vérification de conformité terminée",
+    "zero_trust_verified": "Vérification zéro confiance réussie",
+    "mfa_required": "Authentification multi-facteurs requise"
+  },
+  "compliance": {
+    "gdpr_consent": "Consentement RGPD enregistré",
+    "data_processed": "Données personnelles traitées selon la politique de confidentialité",
+    "retention_policy": "Politique de rétention des données appliquée",
+    "right_to_deletion": "Demande de droit à l'effacement traitée",
+    "data_export": "Exportation des données personnelles terminée",
+    "privacy_notice": "Avis de confidentialité mis à jour",
+    "consent_withdrawn": "Consentement retiré avec succès",
+    "lawful_basis": "Base légale pour le traitement établie"
+  },
+  "monitoring": {
+    "system_healthy": "Vérification de l'état du système réussie",
+    "performance_optimal": "Performance système optimale",
+    "alert_created": "Alerte de surveillance créée",
+    "metric_recorded": "Métrique de performance enregistrée",
+    "threshold_exceeded": "Seuil de performance dépassé",
+    "backup_completed": "Sauvegarde système terminée avec succès",
+    "failover_initiated": "Processus de basculement initié",
+    "recovery_completed": "Récupération système terminée"
+  },
+  "enterprise": {
+    "sla_maintained": "Accord de niveau de service maintenu",
+    "uptime_target_met": "Objectif de temps de fonctionnement atteint",
+    "disaster_recovery": "Procédures de récupération après sinistre activées",
+    "business_continuity": "Plan de continuité des activités exécuté",
+    "global_deployment": "Déploiement global synchronisé",
+    "multi_region_active": "Déploiement multi-région actif",
+    "enterprise_ready": "Infrastructure de niveau entreprise prête",
+    "military_grade": "Protocoles de sécurité de niveau militaire actifs"
+  },
+  "validation": {
+    "required_field": "Ce champ est obligatoire",
+    "invalid_email": "Veuillez fournir une adresse email valide",
+    "password_too_short": "Le mot de passe doit contenir au moins 8 caractères",
+    "password_requirements": "Le mot de passe doit contenir majuscule, minuscule, chiffre et caractère spécial",
+    "invalid_phone": "Veuillez fournir un numéro de téléphone valide",
+    "invalid_date": "Veuillez fournir une date valide",
+    "invalid_format": "Format invalide fourni",
+    "min_length": "La longueur minimale est de {min} caractères",
+    "max_length": "La longueur maximale est de {max} caractères",
+    "numeric_only": "Seules les valeurs numériques sont autorisées",
+    "alphanumeric_only": "Seuls les caractères alphanumériques sont autorisés"
+  }
+}

@@ -1,0 +1,47 @@
+title = "Project New Clean Security Configuration"
+
+[extend]
+# Use gitleaks default rules as base
+useDefault = true
+
+[[rules]]
+description = "PostgreSQL Connection String"
+id = "postgres-connection"
+regex = '''postgres://[a-zA-Z0-9]+:[a-zA-Z0-9]+@[a-zA-Z0-9.-]+:[0-9]+/[a-zA-Z0-9_]+'''
+secretGroup = 1
+
+[[rules]]
+description = "Database Password in Environment"
+id = "db-password"
+regex = '''(?i)(db_pass|db_password|database_password)\s*[:=]\s*['""]?([a-zA-Z0-9!@#$%^&*()_+\-=\[\]{}|;:,.<>?]+)['""]?'''
+secretGroup = 2
+
+[[rules]]
+description = "JWT Secret"
+id = "jwt-secret"
+regex = '''(?i)(jwt_secret|jwt_key|token_secret)\s*[:=]\s*['""]?([a-zA-Z0-9!@#$%^&*()_+\-=\[\]{}|;:,.<>?]{32,})['""]?'''
+secretGroup = 2
+
+[[rules]]
+description = "API Keys"
+id = "api-key"
+regex = '''(?i)(api[_-]?key|apikey)\s*[:=]\s*['""]?([a-zA-Z0-9]{20,})['""]?'''
+secretGroup = 2
+
+[allowlist]
+description = "Allowlisted files and patterns"
+files = [
+    '''(?i).*\.(md|txt|json)$''',
+    '''package-lock\.json$''',
+    '''yarn\.lock$''',
+    '''\.git/.*''',
+    '''node_modules/.*''',
+]
+
+regexes = [
+    '''example\.com''',
+    '''localhost''',
+    '''127\.0\.0\.1''',
+    '''postgres://postgres:postgres@localhost:5432/projectnewtest_db''',
+    '''projectnewtest_db''',
+]

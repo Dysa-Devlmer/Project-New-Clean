@@ -1,0 +1,134 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Enterprise++++ Fortune 10 Global Military i18n Schema",
+  "description": "JSON Schema for validating translation files across all locales to ensure compliance and completeness",
+  "type": "object",
+  "properties": {
+    "api": {
+      "type": "object",
+      "properties": {
+        "welcome": { "type": "string", "minLength": 1 },
+        "unauthorized": { "type": "string", "minLength": 1 },
+        "forbidden": { "type": "string", "minLength": 1 },
+        "not_found": { "type": "string", "minLength": 1 },
+        "internal_error": { "type": "string", "minLength": 1 },
+        "validation_error": { "type": "string", "minLength": 1 },
+        "rate_limit": { "type": "string", "minLength": 1 },
+        "maintenance": { "type": "string", "minLength": 1 }
+      },
+      "required": ["welcome", "unauthorized", "forbidden", "not_found", "internal_error", "validation_error", "rate_limit", "maintenance"],
+      "additionalProperties": false
+    },
+    "auth": {
+      "type": "object",
+      "properties": {
+        "login_success": { "type": "string", "minLength": 1 },
+        "logout_success": { "type": "string", "minLength": 1 },
+        "invalid_credentials": { "type": "string", "minLength": 1 },
+        "account_locked": { "type": "string", "minLength": 1 },
+        "password_expired": { "type": "string", "minLength": 1 },
+        "token_expired": { "type": "string", "minLength": 1 },
+        "insufficient_permissions": { "type": "string", "minLength": 1 },
+        "session_expired": { "type": "string", "minLength": 1 }
+      },
+      "required": ["login_success", "logout_success", "invalid_credentials", "account_locked", "password_expired", "token_expired", "insufficient_permissions", "session_expired"],
+      "additionalProperties": false
+    },
+    "users": {
+      "type": "object",
+      "properties": {
+        "created": { "type": "string", "minLength": 1 },
+        "updated": { "type": "string", "minLength": 1 },
+        "deleted": { "type": "string", "minLength": 1 },
+        "not_found": { "type": "string", "minLength": 1 },
+        "email_exists": { "type": "string", "minLength": 1 },
+        "username_exists": { "type": "string", "minLength": 1 },
+        "invalid_role": { "type": "string", "minLength": 1 },
+        "cannot_delete_self": { "type": "string", "minLength": 1 },
+        "password_changed": { "type": "string", "minLength": 1 }
+      },
+      "required": ["created", "updated", "deleted", "not_found", "email_exists", "username_exists", "invalid_role", "cannot_delete_self", "password_changed"],
+      "additionalProperties": false
+    },
+    "security": {
+      "type": "object",
+      "properties": {
+        "threat_detected": { "type": "string", "minLength": 1 },
+        "access_denied": { "type": "string", "minLength": 1 },
+        "suspicious_activity": { "type": "string", "minLength": 1 },
+        "encryption_enabled": { "type": "string", "minLength": 1 },
+        "audit_log_created": { "type": "string", "minLength": 1 },
+        "compliance_check": { "type": "string", "minLength": 1 },
+        "zero_trust_verified": { "type": "string", "minLength": 1 },
+        "mfa_required": { "type": "string", "minLength": 1 }
+      },
+      "required": ["threat_detected", "access_denied", "suspicious_activity", "encryption_enabled", "audit_log_created", "compliance_check", "zero_trust_verified", "mfa_required"],
+      "additionalProperties": false
+    },
+    "compliance": {
+      "type": "object",
+      "properties": {
+        "gdpr_consent": { "type": "string", "minLength": 1 },
+        "data_processed": { "type": "string", "minLength": 1 },
+        "retention_policy": { "type": "string", "minLength": 1 },
+        "right_to_deletion": { "type": "string", "minLength": 1 },
+        "data_export": { "type": "string", "minLength": 1 },
+        "privacy_notice": { "type": "string", "minLength": 1 },
+        "consent_withdrawn": { "type": "string", "minLength": 1 },
+        "lawful_basis": { "type": "string", "minLength": 1 }
+      },
+      "required": ["gdpr_consent", "data_processed", "retention_policy", "right_to_deletion", "data_export", "privacy_notice", "consent_withdrawn", "lawful_basis"],
+      "additionalProperties": false
+    },
+    "monitoring": {
+      "type": "object",
+      "properties": {
+        "system_healthy": { "type": "string", "minLength": 1 },
+        "performance_optimal": { "type": "string", "minLength": 1 },
+        "alert_created": { "type": "string", "minLength": 1 },
+        "metric_recorded": { "type": "string", "minLength": 1 },
+        "threshold_exceeded": { "type": "string", "minLength": 1 },
+        "backup_completed": { "type": "string", "minLength": 1 },
+        "failover_initiated": { "type": "string", "minLength": 1 },
+        "recovery_completed": { "type": "string", "minLength": 1 }
+      },
+      "required": ["system_healthy", "performance_optimal", "alert_created", "metric_recorded", "threshold_exceeded", "backup_completed", "failover_initiated", "recovery_completed"],
+      "additionalProperties": false
+    },
+    "enterprise": {
+      "type": "object",
+      "properties": {
+        "sla_maintained": { "type": "string", "minLength": 1 },
+        "uptime_target_met": { "type": "string", "minLength": 1 },
+        "disaster_recovery": { "type": "string", "minLength": 1 },
+        "business_continuity": { "type": "string", "minLength": 1 },
+        "global_deployment": { "type": "string", "minLength": 1 },
+        "multi_region_active": { "type": "string", "minLength": 1 },
+        "enterprise_ready": { "type": "string", "minLength": 1 },
+        "military_grade": { "type": "string", "minLength": 1 }
+      },
+      "required": ["sla_maintained", "uptime_target_met", "disaster_recovery", "business_continuity", "global_deployment", "multi_region_active", "enterprise_ready", "military_grade"],
+      "additionalProperties": false
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "required_field": { "type": "string", "minLength": 1 },
+        "invalid_email": { "type": "string", "minLength": 1 },
+        "password_too_short": { "type": "string", "minLength": 1 },
+        "password_requirements": { "type": "string", "minLength": 1 },
+        "invalid_phone": { "type": "string", "minLength": 1 },
+        "invalid_date": { "type": "string", "minLength": 1 },
+        "invalid_format": { "type": "string", "minLength": 1 },
+        "min_length": { "type": "string", "minLength": 1, "pattern": ".*\\{min\\}.*" },
+        "max_length": { "type": "string", "minLength": 1, "pattern": ".*\\{max\\}.*" },
+        "numeric_only": { "type": "string", "minLength": 1 },
+        "alphanumeric_only": { "type": "string", "minLength": 1 }
+      },
+      "required": ["required_field", "invalid_email", "password_too_short", "password_requirements", "invalid_phone", "invalid_date", "invalid_format", "min_length", "max_length", "numeric_only", "alphanumeric_only"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["api", "auth", "users", "security", "compliance", "monitoring", "enterprise", "validation"],
+  "additionalProperties": false
+}

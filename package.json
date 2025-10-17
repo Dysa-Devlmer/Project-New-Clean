@@ -1,9 +1,9 @@
 {
-  "name": "project-new-test",
+  "name": "project-new-clean",
   "private": true,
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/common/*"
   ],
   "scripts": {
     "build": "yarn workspace backend build && yarn workspace admin-panel build",

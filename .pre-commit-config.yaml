@@ -1,0 +1,74 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: package-lock.json|yarn.lock
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.0
+    hooks:
+      - id: gitleaks
+
+  - repo: local
+    hooks:
+      - id: eslint
+        name: ESLint
+        entry: yarn workspace backend lint
+        language: system
+        files: apps/backend/.*\.(js|ts)$
+        pass_filenames: false
+
+      - id: eslint-frontend
+        name: ESLint Frontend
+        entry: yarn workspace admin-panel lint
+        language: system
+        files: apps/admin-panel/.*\.(js|ts|tsx)$
+        pass_filenames: false
+
+      - id: typescript-check-backend
+        name: TypeScript Check Backend
+        entry: yarn workspace backend type-check
+        language: system
+        files: apps/backend/.*\.ts$
+        pass_filenames: false
+
+      - id: typescript-check-frontend
+        name: TypeScript Check Frontend
+        entry: yarn workspace admin-panel type-check
+        language: system
+        files: apps/admin-panel/.*\.(ts|tsx)$
+        pass_filenames: false
+
+      - id: security-audit
+        name: Security Audit
+        entry: yarn audit --level moderate
+        language: system
+        pass_filenames: false
+
+      - id: dockerfile-lint
+        name: Dockerfile Lint
+        entry: hadolint
+        language: system
+        files: .*Dockerfile.*
+        args: ['--ignore', 'DL3008', '--ignore', 'DL3009']
+
+  - repo: https://github.com/bridgecrewio/checkov
+    rev: 3.0.0
+    hooks:
+      - id: checkov
+        args: ['-d', '.', '--framework', 'dockerfile', '--framework', 'github_actions']

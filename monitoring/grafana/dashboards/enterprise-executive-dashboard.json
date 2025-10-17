@@ -1,0 +1,333 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Fortune 10 Global Military - Executive Dashboard",
+    "tags": ["enterprise", "executive", "fortune10", "military"],
+    "style": "dark",
+    "timezone": "UTC",
+    "refresh": "30s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "annotations": {
+      "list": [
+        {
+          "name": "Security Incidents",
+          "datasource": "prometheus-enterprise",
+          "enable": true,
+          "expr": "increase(security_incidents_total[5m]) > 0",
+          "iconColor": "red",
+          "titleFormat": "Security Alert",
+          "textFormat": "{{title}}: {{description}}"
+        },
+        {
+          "name": "Compliance Violations",
+          "datasource": "prometheus-enterprise",
+          "enable": true,
+          "expr": "increase(compliance_violations_total[5m]) > 0",
+          "iconColor": "orange",
+          "titleFormat": "Compliance Alert"
+        }
+      ]
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "🏛️ Enterprise Health Score",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "avg(enterprise_health_score)",
+            "legendFormat": "Overall Health"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "unit": "percent",
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                { "color": "red", "value": 0 },
+                { "color": "yellow", "value": 85 },
+                { "color": "green", "value": 95 }
+              ]
+            }
+          }
+        },
+        "gridPos": { "h": 8, "w": 6, "x": 0, "y": 0 }
+      },
+      {
+        "id": 2,
+        "title": "💰 Revenue Impact Protection",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(rate(revenue_protected_total[1h])) * 3600",
+            "legendFormat": "Protected Revenue/Hour"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "currencyUSD",
+            "color": { "mode": "palette-classic" }
+          }
+        },
+        "gridPos": { "h": 8, "w": 6, "x": 6, "y": 0 }
+      },
+      {
+        "id": 3,
+        "title": "🔐 Security Posture",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "security_posture_score",
+            "legendFormat": "Security Score"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "unit": "percent",
+            "thresholds": {
+              "steps": [
+                { "color": "red", "value": 0 },
+                { "color": "yellow", "value": 80 },
+                { "color": "green", "value": 95 }
+              ]
+            }
+          }
+        },
+        "gridPos": { "h": 8, "w": 6, "x": 12, "y": 0 }
+      },
+      {
+        "id": 4,
+        "title": "📊 Global Operations Status",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "count(up{job=~\".*-enterprise\"} == 1)",
+            "legendFormat": "Services Online"
+          },
+          {
+            "expr": "count(up{job=~\".*-enterprise\"})",
+            "legendFormat": "Total Services"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 6, "x": 18, "y": 0 }
+      },
+      {
+        "id": 5,
+        "title": "🌍 Multi-Region Availability",
+        "type": "worldmap",
+        "targets": [
+          {
+            "expr": "avg by (region) (up{job=~\".*-enterprise\"})",
+            "legendFormat": "{{region}}"
+          }
+        ],
+        "gridPos": { "h": 10, "w": 12, "x": 0, "y": 8 }
+      },
+      {
+        "id": 6,
+        "title": "📈 Enterprise SLA Compliance",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "sla_availability_percentage",
+            "legendFormat": "Availability",
+            "format": "table"
+          },
+          {
+            "expr": "sla_response_time_p95",
+            "legendFormat": "Response Time P95",
+            "format": "table"
+          },
+          {
+            "expr": "sla_error_rate_percentage",
+            "legendFormat": "Error Rate",
+            "format": "table"
+          }
+        ],
+        "transformations": [
+          {
+            "id": "merge",
+            "options": {}
+          },
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {
+                "Time": true
+              },
+              "renameByName": {
+                "service": "Service",
+                "Value #A": "Availability %",
+                "Value #B": "P95 Response Time",
+                "Value #C": "Error Rate %"
+              }
+            }
+          }
+        ],
+        "gridPos": { "h": 10, "w": 12, "x": 12, "y": 8 }
+      },
+      {
+        "id": 7,
+        "title": "🚨 Critical Alerts - Last 24H",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(increase(alertmanager_alerts_total{severity=\"critical\"}[24h]))",
+            "legendFormat": "Critical"
+          },
+          {
+            "expr": "sum(increase(alertmanager_alerts_total{severity=\"warning\"}[24h]))",
+            "legendFormat": "Warning"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                { "color": "green", "value": 0 },
+                { "color": "yellow", "value": 1 },
+                { "color": "red", "value": 5 }
+              ]
+            }
+          }
+        },
+        "gridPos": { "h": 6, "w": 8, "x": 0, "y": 18 }
+      },
+      {
+        "id": 8,
+        "title": "💼 Business Continuity Status",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "business_continuity_rto_minutes",
+            "legendFormat": "RTO (minutes)"
+          },
+          {
+            "expr": "business_continuity_rpo_minutes",
+            "legendFormat": "RPO (minutes)"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "m",
+            "thresholds": {
+              "steps": [
+                { "color": "green", "value": 0 },
+                { "color": "yellow", "value": 15 },
+                { "color": "red", "value": 60 }
+              ]
+            }
+          }
+        },
+        "gridPos": { "h": 6, "w": 8, "x": 8, "y": 18 }
+      },
+      {
+        "id": 9,
+        "title": "🏅 Compliance Score",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "compliance_overall_score",
+            "legendFormat": "Overall Compliance"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "unit": "percent",
+            "thresholds": {
+              "steps": [
+                { "color": "red", "value": 0 },
+                { "color": "yellow", "value": 90 },
+                { "color": "green", "value": 98 }
+              ]
+            }
+          }
+        },
+        "gridPos": { "h": 6, "w": 8, "x": 16, "y": 18 }
+      },
+      {
+        "id": 10,
+        "title": "🔍 Security Incidents Timeline",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "rate(security_incidents_total[5m])",
+            "legendFormat": "{{severity}} - {{type}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "drawStyle": "bars",
+              "fillOpacity": 100
+            },
+            "color": { "mode": "palette-classic" }
+          }
+        },
+        "gridPos": { "h": 8, "w": 24, "x": 0, "y": 24 }
+      },
+      {
+        "id": 11,
+        "title": "📊 Enterprise KPIs Dashboard",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "enterprise_kpi_customer_satisfaction",
+            "legendFormat": "Customer Satisfaction",
+            "format": "table"
+          },
+          {
+            "expr": "enterprise_kpi_operational_efficiency",
+            "legendFormat": "Operational Efficiency",
+            "format": "table"
+          },
+          {
+            "expr": "enterprise_kpi_security_effectiveness",
+            "legendFormat": "Security Effectiveness",
+            "format": "table"
+          },
+          {
+            "expr": "enterprise_kpi_compliance_adherence",
+            "legendFormat": "Compliance Adherence",
+            "format": "table"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "displayMode": "gradient-gauge",
+              "min": 0,
+              "max": 100
+            },
+            "unit": "percent",
+            "thresholds": {
+              "steps": [
+                { "color": "red", "value": 0 },
+                { "color": "yellow", "value": 85 },
+                { "color": "green", "value": 95 }
+              ]
+            }
+          }
+        },
+        "gridPos": { "h": 8, "w": 24, "x": 0, "y": 32 }
+      }
+    ]
+  },
+  "overwrite": true,
+  "message": "Fortune 10 Global Military Executive Dashboard - Enterprise Monitoring"
+}

@@ -1,0 +1,196 @@
+# Prometheus Configuration for Enterprise Fortune 10 Global Military
+# High-availability, multi-region monitoring with enterprise SLAs
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'enterprise-fortune10-production'
+    region: 'us-east-1'
+    environment: 'production'
+    compliance_level: 'nist-800-53-high'
+
+# Enterprise AlertManager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager-primary.internal:9093
+          - alertmanager-secondary.internal:9093
+      scheme: https
+      tls_config:
+        cert_file: /etc/prometheus/certs/prometheus.pem
+        key_file: /etc/prometheus/certs/prometheus-key.pem
+        ca_file: /etc/prometheus/certs/ca-chain.pem
+
+# Enterprise alerting rules
+rule_files:
+  - "rules/enterprise-sla-rules.yml"
+  - "rules/security-rules.yml"
+  - "rules/compliance-rules.yml"
+  - "rules/business-continuity-rules.yml"
+
+# Scrape configurations for enterprise services
+scrape_configs:
+  # Backend service monitoring with mTLS
+  - job_name: 'backend-enterprise'
+    scrape_interval: 10s
+    scheme: https
+    tls_config:
+      cert_file: /etc/prometheus/certs/prometheus.pem
+      key_file: /etc/prometheus/certs/prometheus-key.pem
+      ca_file: /etc/prometheus/certs/ca-chain.pem
+      server_name: backend.internal
+    static_configs:
+      - targets: ['backend.internal:9090']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: backend.internal:9090
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'enterprise_.*'
+        action: keep
+
+  # Admin Panel monitoring
+  - job_name: 'admin-panel-enterprise'
+    scrape_interval: 10s
+    scheme: https
+    tls_config:
+      cert_file: /etc/prometheus/certs/prometheus.pem
+      key_file: /etc/prometheus/certs/prometheus-key.pem
+      ca_file: /etc/prometheus/certs/ca-chain.pem
+      server_name: admin-panel.internal
+    static_configs:
+      - targets: ['admin-panel.internal:9090']
+
+  # PostgreSQL monitoring with enhanced security
+  - job_name: 'postgres-enterprise'
+    scrape_interval: 30s
+    scheme: https
+    tls_config:
+      cert_file: /etc/prometheus/certs/prometheus.pem
+      key_file: /etc/prometheus/certs/prometheus-key.pem
+      ca_file: /etc/prometheus/certs/ca-chain.pem
+    static_configs:
+      - targets: ['postgres-exporter.internal:9187']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'postgres-primary'
+
+  # Node exporter for infrastructure monitoring
+  - job_name: 'node-exporter-enterprise'
+    scrape_interval: 30s
+    scheme: https
+    tls_config:
+      cert_file: /etc/prometheus/certs/prometheus.pem
+      key_file: /etc/prometheus/certs/prometheus-key.pem
+      ca_file: /etc/prometheus/certs/ca-chain.pem
+    kubernetes_sd_configs:
+      - role: node
+    relabel_configs:
+      - action: labelmap
+        regex: __meta_kubernetes_node_label_(.+)
+      - source_labels: [__meta_kubernetes_node_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+
+  # Kubernetes API server monitoring
+  - job_name: 'kubernetes-apiservers'
+    kubernetes_sd_configs:
+      - role: endpoints
+    scheme: https
+    tls_config:
+      ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: default;kubernetes;https
+
+  # Enterprise security monitoring
+  - job_name: 'security-monitoring'
+    scrape_interval: 5s  # High frequency for security events
+    scheme: https
+    tls_config:
+      cert_file: /etc/prometheus/certs/prometheus.pem
+      key_file: /etc/prometheus/certs/prometheus-key.pem
+      ca_file: /etc/prometheus/certs/ca-chain.pem
+    static_configs:
+      - targets:
+        - 'falco-exporter.internal:9376'
+        - 'oauth-proxy.internal:9090'
+        - 'cert-manager.internal:9402'
+
+  # Business continuity monitoring
+  - job_name: 'disaster-recovery'
+    scrape_interval: 60s
+    scheme: https
+    tls_config:
+      cert_file: /etc/prometheus/certs/prometheus.pem
+      key_file: /etc/prometheus/certs/prometheus-key.pem
+      ca_file: /etc/prometheus/certs/ca-chain.pem
+    static_configs:
+      - targets:
+        - 'backup-monitor.internal:9090'
+        - 'replication-monitor.internal:9090'
+        - 'failover-controller.internal:9090'
+
+  # Compliance monitoring
+  - job_name: 'compliance-monitoring'
+    scrape_interval: 300s  # Every 5 minutes
+    scheme: https
+    tls_config:
+      cert_file: /etc/prometheus/certs/prometheus.pem
+      key_file: /etc/prometheus/certs/prometheus-key.pem
+      ca_file: /etc/prometheus/certs/ca-chain.pem
+    static_configs:
+      - targets:
+        - 'audit-log-exporter.internal:9090'
+        - 'compliance-scanner.internal:9090'
+        - 'policy-engine.internal:9090'
+
+  # Multi-region federation
+  - job_name: 'prometheus-federation'
+    scrape_interval: 30s
+    honor_labels: true
+    metrics_path: '/federate'
+    params:
+      'match[]':
+        - '{job=~"prometheus"}'
+        - '{__name__=~"job:.*"}'
+        - '{__name__=~"enterprise_.*"}'
+    static_configs:
+      - targets:
+        - 'prometheus-us-west-2.internal:9090'
+        - 'prometheus-eu-west-1.internal:9090'
+        - 'prometheus-ap-southeast-1.internal:9090'
+
+# Remote write for long-term storage and compliance
+remote_write:
+  - url: "https://enterprise-tsdb.internal/api/v1/write"
+    tls_config:
+      cert_file: /etc/prometheus/certs/prometheus.pem
+      key_file: /etc/prometheus/certs/prometheus-key.pem
+      ca_file: /etc/prometheus/certs/ca-chain.pem
+    queue_config:
+      max_samples_per_send: 10000
+      batch_send_deadline: 5s
+      min_shards: 1
+      max_shards: 200
+    write_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'enterprise_.*|sla_.*|compliance_.*'
+        action: keep
+
+# Remote read for historical data analysis
+remote_read:
+  - url: "https://enterprise-tsdb.internal/api/v1/read"
+    tls_config:
+      cert_file: /etc/prometheus/certs/prometheus.pem
+      key_file: /etc/prometheus/certs/prometheus-key.pem
+      ca_file: /etc/prometheus/certs/ca-chain.pem
