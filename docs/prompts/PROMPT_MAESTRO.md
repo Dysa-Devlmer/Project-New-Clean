@@ -1,38 +1,50 @@
-# PROMPT MAESTRO - POS MISTURA v2
-## Sistema de Punto de Venta con Configuración Dinámica
+# PROMPT MAESTRO - DYSA POINT ENTERPRISE v2.1
+## Sistema de Punto de Venta con Configuración Dinámica y Interfaces Web
 
 ### CONTEXTO DEL PROYECTO
-- **Sistema**: POS (Point of Sale) llamado "MISTURA"
+- **Sistema**: DYSA Point Enterprise (anteriormente "MISTURA")
 - **Stack**: Node.js + Express + MySQL + Frontend HTML/CSS/JS
-- **Estructura**: Monorepo con `backend/` y `frontend/`
+- **Estructura**: Monorepo con `backend/` y arquitectura modular
 - **BD**: MySQL (dysa_point) con usuario `devlmer`/`devlmer2025`
-- **Puerto**: Backend en 3001, Frontend en 3000
+- **Puerto**: Backend dinámico (8547 por defecto, configurable)
 
-### ESTADO ACTUAL (Octubre 2025)
-- ✅ Estructura base del proyecto creada
+### ESTADO ACTUAL (19 Octubre 2025) ✅ COMPLETADO
+- ✅ Estructura base del proyecto creada y refinada
 - ✅ Configuración de BD y conexión establecida
-- ✅ Migraciones v2 creadas (16 tablas + seeds)
-- 🔄 **CHECKPOINT ACTUAL**: Aplicar migraciones y crear servicios
+- ✅ Migraciones sistema aplicadas (4 tablas configuración)
+- ✅ Servicios y repositorios de sistema implementados
+- ✅ **Endpoints de configuración funcionando**
+- ✅ **Reinicio controlado dinámico implementado**
+- ✅ **Interfaces web de configuración completadas**
+- 🎯 **CHECKPOINT ACTUAL**: interfaces_web_setup_config_completadas
 
-### ARQUITECTURA DE CONFIGURACIÓN v2
+### ARQUITECTURA ACTUAL v2.1 ✅ IMPLEMENTADA
 
-#### Tablas Principales:
-1. **configuracion_sistema_base** - Config global del sistema
-2. **configuracion_categorias** - Categorías dinámicas
-3. **configuracion_productos** - Productos con precios/impuestos
-4. **configuracion_impuestos** - Tipos de impuestos configurables
-5. **configuracion_descuentos** - Descuentos automáticos/manuales
-6. **configuracion_interfaz** - Personalización UI
-7. **configuracion_integraciones** - APIs externas
-8. **configuracion_reportes** - Templates de reportes
-9. **config_monedas** - Monedas soportadas
-10. **config_metodos_pago** - Métodos de pago activos
+#### Tablas de Sistema (COMPLETADAS):
+1. **sistema_red** - Configuración de conectividad (host, puertos, SSL)
+2. **sistema_instalacion** - Estado y progreso de instalación
+3. **restaurante_duenio** - Información del propietario
+4. **restaurante_sucursal** - Configuración de sucursales
 
-#### Endpoints Críticos a Implementar:
-- `GET/PUT /api/configuracion/sistema/configuracion` - Config general
-- `GET /api/configuracion/categorias/lista` - Lista categorías
-- `GET/POST/PUT/DELETE /api/configuracion/productos` - CRUD productos
-- `GET /api/configuracion/impuestos/activos` - Impuestos vigentes
+#### Interfaces Web Implementadas:
+- **`/setup`** - Asistente de instalación completo (wizard 4 pasos)
+- **`/config/red`** - Configuración de red dinámica con reinicio controlado
+- **`/setup-test`** - Ruta de prueba para validar arquitectura
+
+#### Endpoints de Sistema Funcionando:
+- `GET /api/sistema/red` - Configuración actual de red
+- `PUT /api/sistema/red` - Actualizar configuración + reinicio automático
+- `POST /api/sistema/red/test` - Probar conectividad
+- `GET /api/setup/status` - Estado de instalación del sistema
+- `POST /api/setup/instalacion` - Completar proceso de instalación
+- `GET /api/sistema/health` - Health check extendido con info de configuración
+
+#### Funcionalidades Avanzadas Implementadas:
+- 🔄 **Reinicio controlado dinámico** sin matar el agente
+- 🧪 **Pruebas de conectividad** antes de aplicar cambios
+- 📊 **Tracking de progreso** en tiempo real
+- 🔄 **Redirección automática** al cambiar puertos
+- ✅ **Validación en tiempo real** de formularios
 
 ### REGLAS DE IMPLEMENTACIÓN
 
@@ -67,52 +79,114 @@ backend/src/
 - `002_configuracion_sistema_seeds_v2.sql` (datos iniciales)
 - Runner: `run-migrations-improved.js`
 
-### PRÓXIMOS PASOS OBLIGATORIOS
+### ✅ FASES COMPLETADAS
 
-#### Fase 1: Aplicar Migraciones v2
-1. Ejecutar `node backend/src/database/run-migrations-improved.js`
-2. Verificar 16 tablas creadas en `dysa_point`
-3. Confirmar seeds aplicados correctamente
+#### Fase 1: Sistema de Configuración ✅ COMPLETADO
+- ✅ Migraciones de sistema aplicadas (4 tablas)
+- ✅ Servicios y repositorios implementados
+- ✅ Endpoints de configuración funcionando
 
-#### Fase 2: Servicios Core
-1. Implementar `configuracion.repository.js` con métodos:
-   - `getConfiguracionSistema()`
-   - `updateConfiguracionSistema(datos)`
-   - `getCategorias()`
-2. Crear `configuracion.service.js` con validaciones
-3. Implementar `configuracion.controller.js` con endpoints
+#### Fase 2: Interfaces Web ✅ COMPLETADO
+- ✅ Asistente de instalación `/setup` (wizard completo)
+- ✅ Configuración de red `/config/red` (con reinicio controlado)
+- ✅ Arquitectura server.js/app.js corregida
 
-#### Fase 3: Testing y Validación
-1. Probar endpoints con Postman/curl
-2. Verificar persistencia en BD
-3. Validar respuestas JSON correctas
+### 🚀 PRÓXIMOS PASOS SUGERIDOS
+
+#### Fase 3: Shared Packages Dinámicos
+1. Actualizar `@dysa/shared-config` para refrescar configuración runtime
+2. Actualizar `@dysa/shared-events` para reconexión SSE automática
+3. Actualizar `@dysa/shared-http` para cambio baseURL dinámico
+
+#### Fase 4: Mejoras Avanzadas
+1. **SSL/HTTPS Implementation** - Soporte completo para certificados
+2. **Multi-tenant Support** - Múltiples restaurantes por instancia
+3. **Dashboard de Monitoreo** - Métricas de red y rendimiento
+4. **Configuración de Productos** - Interfaz para catálogo completo
+
+#### Fase 5: Testing y Optimización
+1. Tests automatizados para interfaces web
+2. Performance monitoring y optimización
+3. Documentación de usuario final
 
 ### COMANDOS ESENCIALES
+
+#### Iniciar/Detener Servidor
 ```bash
-# Variables de entorno
-$env:DB_HOST="localhost"
-$env:DB_PORT="3306"
-$env:DB_USER="devlmer"
-$env:DB_PASS="devlmer2025"
-$env:DB_NAME="dysa_point"
+# Iniciar servidor (puerto dinámico, 8547 por defecto)
+cd "E:\POS SYSME\POS_MISTURA\backend"
+npm run server:start
 
-# Aplicar migraciones
-node backend/src/database/run-migrations-improved.js
+# Detener servidor
+npm run server:stop
 
-# Verificar tablas
-node backend/src/database/print-tables.js
+# Reiniciar servidor
+npm run server:restart
 
-# Iniciar backend
-cd backend && npm start
+# Ver estado
+npm run server:status
+```
+
+#### Verificar Sistema
+```bash
+# Health check básico
+curl -s http://localhost:8547/health
+
+# Health check extendido
+curl -s http://localhost:8547/api/sistema/health
+
+# Estado de instalación
+curl -s http://localhost:8547/api/setup/status
+
+# Configuración de red actual
+curl -s http://localhost:8547/api/sistema/red
+```
+
+#### Interfaces Web
+```bash
+# Acceder al asistente de instalación
+http://localhost:8547/setup
+
+# Acceder a configuración de red
+http://localhost:8547/config/red
+
+# Ruta de prueba (validar arquitectura)
+http://localhost:8547/setup-test
+```
+
+#### Variables de Entorno
+```bash
+DB_HOST="localhost"
+DB_PORT="3306"
+DB_USER="devlmer"
+DB_PASS="devlmer2025"
+DB_NAME="dysa_point"
+PORT="8547"  # Puerto dinámico, configurable desde /config/red
 ```
 
 ### CHECKPOINT DE RECUPERACIÓN
 Cuando el agente se reinicie, DEBE:
 1. Leer este archivo completo
 2. Leer `CONTINUE.md` para el próximo paso específico
-3. Ejecutar `npm run agent:continue` para mostrar estado
-4. Continuar desde el checkpoint sin repetir pasos previos
+3. Leer `.agent-state.json` para el estado exacto
+4. Ejecutar `npm run server:start` para iniciar el backend
+5. Verificar `curl -s http://localhost:8547/setup-test` (debe responder desde app.js)
+6. Continuar desde el checkpoint sin repetir pasos previos
+
+### ESTADO TÉCNICO ACTUAL ✅
+- **Checkpoint**: `interfaces_web_setup_config_completadas`
+- **Puerto**: 8547 (dinámico, configurable desde `/config/red`)
+- **Interfaces**: `/setup` y `/config/red` completamente funcionales
+- **Arquitectura**: server.js usa app.js correctamente
+- **Repositorio**: `Dysa-Devlmer/Project-New-Clean` (actualizado)
+- **Instalación**: Pendiente (usar `/setup` para completar)
+
+### LECCIONES IMPORTANTES
+- **Reinicio controlado**: NO recarga código, solo cambia puertos
+- **Para código nuevo**: `npm run server:stop && npm run server:start`
+- **Para config/puerto**: usar endpoint `PUT /api/sistema/red`
+- **Rutas 404**: Las rutas web deben estar ANTES del middleware 404 en app.js
 
 ---
 
-**"Perfecto. Continúa exactamente desde donde quedamos, sin repetir pasos previos, siguiendo todas las instrucciones del prompt principal y guardando cada avance en el repositorio limpio."**
+**"Perfecto. Las interfaces web están completadas y funcionando. El sistema está listo para configuración desde `/setup` y gestión de red desde `/config/red`. Próximo paso sugerido: shared packages dinámicos o SSL implementation."**
