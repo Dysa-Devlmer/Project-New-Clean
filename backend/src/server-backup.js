@@ -1,7 +1,7 @@
 /**
- * DYSA Point - Aplicación Express
- * Configuración de la aplicación sin el servidor HTTP
- * Fecha: 19 de Octubre 2025
+ * SYSME Backend Server - Sistema POS para Restaurante
+ * Servidor Express con todas las funcionalidades del sistema antiguo
+ * Fecha: 18 de Octubre 2025
  */
 
 const express = require('express');
@@ -10,7 +10,10 @@ const bodyParser = require('body-parser');
 const path = require('path');
 require('dotenv').config();
 
+const { testConnection } = require('./config/database');
+
 const app = express();
+const PORT = process.env.PORT || 8547; // Puerto estándar del sistema
 
 // Middleware
 app.use(cors());
@@ -57,9 +60,6 @@ app.get('/clientes', (req, res) => {
     res.sendFile(path.join(__dirname, '../static/clientes/gestion-clientes.html'));
 });
 
-// === RUTAS DE CONFIGURACIÓN DEL SISTEMA ===
-// Movidas al final del archivo, antes del middleware 404
-
 // Reportes
 app.get('/reportes', (req, res) => {
     res.sendFile(path.join(__dirname, '../static/reportes/dashboard-reportes.html'));
@@ -101,8 +101,8 @@ const clientesRoutes = require('./routes/clientes');
 const reportesRoutes = require('./routes/reportes');
 const configuracionRoutes = require('./routes/configuracion');
 const { router: eventsRoutes } = require('./routes/events');
-const ticketsRoutes = require('./routes/tickets');
-const systemConfigRoutes = require('./routes/system-config');
+const ticketsRoutes = require('./routes/tickets'); // Nueva ruta de tickets
+const systemConfigRoutes = require('./routes/system-config'); // Configuración del sistema
 
 // Montar rutas principales del POS
 app.use('/api/auth', authRoutes);
@@ -114,38 +114,13 @@ app.use('/api/clientes', clientesRoutes);
 app.use('/api/reportes', reportesRoutes);
 app.use('/api/configuracion', configuracionRoutes);
 app.use('/api/events', eventsRoutes);
-app.use('/api/pos/tickets', ticketsRoutes);
-app.use('/api/sistema', systemConfigRoutes);
-app.use('/api/setup', systemConfigRoutes);
+app.use('/api/pos/tickets', ticketsRoutes); // Tickets/POS con sincronización SSE
+app.use('/api/sistema', systemConfigRoutes); // Configuración de sistema y red
+app.use('/api/setup', systemConfigRoutes); // Asistente de instalación
 
 // Ruta de prueba
 app.get('/api/test', (req, res) => {
     res.json({ message: 'API funcionando correctamente', timestamp: new Date().toISOString() });
-});
-
-// Prueba temporal de setup
-app.get('/api/setup-working', (req, res) => {
-    res.json({ message: 'Setup route is working via API!', timestamp: new Date().toISOString() });
-});
-
-// === RUTAS DE INTERFACES WEB ===
-// IMPORTANTE: Estas rutas deben estar ANTES del middleware 404
-
-// Asistente de Instalación
-app.get('/setup', (req, res) => {
-    const filePath = path.resolve(__dirname, '../static/config/setup-wizard.html');
-    console.log('Setup path:', filePath);
-    res.sendFile(filePath);
-});
-
-// Ruta de prueba para validar carga de código
-app.get('/setup-test', (req, res) => {
-    res.json({ ok: true, from: 'app.js', at: new Date().toISOString() });
-});
-
-// Configuración de Red
-app.get('/config/red', (req, res) => {
-    res.sendFile(path.join(__dirname, '../static/config/network-config.html'));
 });
 
 // Manejo de errores 404
@@ -166,4 +141,65 @@ app.use((err, req, res, next) => {
     });
 });
 
+// Iniciar servidor
+async function iniciarServidor() {
+    try {
+        // Verificar conexión a base de datos
+        console.log('\n🔍 Verificando conexión a base de datos...');
+        const dbConnected = await testConnection();
+
+        if (!dbConnected) {
+            console.error('\n⚠️  ADVERTENCIA: No se pudo conectar a la base de datos');
+            console.error('   El servidor iniciará pero no funcionará correctamente');
+            console.error('   Verifique la configuración en el archivo .env\n');
+        }
+
+        // Iniciar servidor HTTP con referencia para reinicio controlado
+        const server = app.listen(PORT, '0.0.0.0', () => {
+            console.log('\n' + '='.repeat(60));
+            console.log('🚀 SERVIDOR DYSA POINT ENTERPRISE INICIADO - PRODUCCIÓN');
+            console.log('='.repeat(60));
+            console.log(`   Puerto: ${PORT}`);
+            console.log(`   Ambiente: ${process.env.NODE_ENV || 'development'}`);
+            console.log(`   Base de datos: ${process.env.DB_NAME || 'dysa_point'}`);
+            console.log('\n📡 Acceso desde red local:');
+            console.log(`   http://localhost:${PORT}`);
+            console.log(`   http://192.168.1.X:${PORT} (reemplazar X con IP real)`);
+            console.log('\n📋 Endpoints disponibles:');
+            console.log(`   GET  /health - Estado del servidor`);
+            console.log(`   GET  /api/mesas - Listar mesas`);
+            console.log(`   GET  /api/mesas/estado - Estado de mesas`);
+            console.log(`   GET  /api/categorias - Categorías de productos`);
+            console.log(`   GET  /api/productos - Todos los productos`);
+            console.log(`   POST /api/pedidos - Crear pedido`);
+            console.log(`   POST /api/pedidos/enviar-cocina - Enviar a cocina`);
+            console.log('='.repeat(60) + '\n');
+        });
+
+        // Guardar referencia del servidor en la aplicación para reinicio controlado
+        app.set('http-server', server);
+        app.set('http-port', PORT);
+        app.set('http-host', '0.0.0.0');
+
+    } catch (error) {
+        console.error('❌ Error al iniciar servidor:', error);
+        process.exit(1);
+    }
+}
+
+// Manejo de señales de cierre
+process.on('SIGTERM', () => {
+    console.log('\n⚠️  Señal SIGTERM recibida. Cerrando servidor...');
+    process.exit(0);
+});
+
+process.on('SIGINT', () => {
+    console.log('\n\n⚠️  Señal SIGINT recibida. Cerrando servidor...');
+    process.exit(0);
+});
+
+// Exportar aplicación para reinicio controlado
 module.exports = app;
+
+// Iniciar
+iniciarServidor();

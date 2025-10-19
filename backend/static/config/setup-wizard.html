@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DYSA Point - Asistente de Instalación</title>
+    <link rel="stylesheet" href="/static/terminal/css/restaurant-theme.css">
+    <style>
+        .setup-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .setup-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .setup-header {
+            background: linear-gradient(45deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .setup-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .setup-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .setup-content {
+            padding: 40px;
+        }
+
+        .step-progress {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ecf0f1;
+            color: #7f8c8d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: var(--transition);
+        }
+
+        .step.active .step-number {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .step-connector {
+            width: 50px;
+            height: 2px;
+            background: #ecf0f1;
+            margin: 0 10px;
+        }
+
+        .step.completed + .step .step-connector {
+            background: var(--success-color);
+        }
+
+        .step-panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .step-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .step-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #ecf0f1;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .alert-info {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .status-pending {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .welcome-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--secondary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="setup-container">
+        <div class="setup-card">
+            <div class="setup-header">
+                <div class="welcome-icon">🚀</div>
+                <h1>DYSA Point Enterprise</h1>
+                <p>Asistente de Instalación y Configuración</p>
+            </div>
+
+            <div class="setup-content">
+                <!-- Progreso del Setup -->
+                <div class="step-progress">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step" data-step="4">
+                        <div class="step-number">4</div>
+                    </div>
+                </div>
+
+                <!-- Paso 1: Bienvenida y Verificación -->
+                <div class="step-panel active" id="step-1">
+                    <h2>Bienvenido a DYSA Point Enterprise</h2>
+                    <p>Este asistente te guiará para configurar tu sistema de punto de venta paso a paso.</p>
+
+                    <div class="alert alert-info">
+                        <strong>Estado del Sistema:</strong> <span class="status-badge status-pending">Requiere Configuración</span>
+                    </div>
+
+                    <div id="system-check">
+                        <h3>Verificación del Sistema</h3>
+                        <div class="loading active">
+                            <div class="spinner"></div>
+                            <p>Verificando componentes del sistema...</p>
+                        </div>
+                        <div id="check-results" style="display: none;"></div>
+                    </div>
+                </div>
+
+                <!-- Paso 2: Información del Dueño -->
+                <div class="step-panel" id="step-2">
+                    <h2>Información del Propietario</h2>
+                    <p>Por favor, ingresa la información del dueño del restaurante:</p>
+
+                    <form id="owner-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nombre">Nombre Completo *</label>
+                                <input type="text" id="nombre" name="nombre" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="telefono">Teléfono *</label>
+                                <input type="tel" id="telefono" name="telefono" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email">Correo Electrónico *</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cedula">Cédula/RUC *</label>
+                                <input type="text" id="cedula" name="cedula" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="direccion">Dirección</label>
+                            <textarea id="direccion" name="direccion" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Paso 3: Configuración del Restaurante -->
+                <div class="step-panel" id="step-3">
+                    <h2>Configuración del Restaurante</h2>
+                    <p>Configura los datos básicos de tu restaurante:</p>
+
+                    <form id="restaurant-form">
+                        <div class="form-group">
+                            <label for="nombre_restaurante">Nombre del Restaurante *</label>
+                            <input type="text" id="nombre_restaurante" name="nombre_restaurante" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="tipo_restaurante">Tipo de Restaurante *</label>
+                                <select id="tipo_restaurante" name="tipo_restaurante" required>
+                                    <option value="">Seleccionar tipo</option>
+                                    <option value="restaurante">Restaurante</option>
+                                    <option value="cafeteria">Cafetería</option>
+                                    <option value="comida_rapida">Comida Rápida</option>
+                                    <option value="bar">Bar</option>
+                                    <option value="panaderia">Panadería</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="moneda">Moneda Principal *</label>
+                                <select id="moneda" name="moneda" required>
+                                    <option value="USD">Dólar (USD)</option>
+                                    <option value="COP">Peso Colombiano (COP)</option>
+                                    <option value="EUR">Euro (EUR)</option>
+                                    <option value="PEN">Sol Peruano (PEN)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="numero_mesas">Número de Mesas</label>
+                                <input type="number" id="numero_mesas" name="numero_mesas" min="1" max="100" value="10">
+                            </div>
+                            <div class="form-group">
+                                <label for="zona_horaria">Zona Horaria</label>
+                                <select id="zona_horaria" name="zona_horaria">
+                                    <option value="America/Bogota">Colombia (UTC-5)</option>
+                                    <option value="America/Lima">Perú (UTC-5)</option>
+                                    <option value="America/New_York">Estados Unidos Este (UTC-5)</option>
+                                    <option value="Europe/Madrid">España (UTC+1)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Paso 4: Finalización -->
+                <div class="step-panel" id="step-4">
+                    <h2>Finalización de la Instalación</h2>
+                    <p>Revisa la configuración y completa la instalación:</p>
+
+                    <div id="configuration-summary">
+                        <h3>Resumen de Configuración</h3>
+                        <div class="loading active">
+                            <div class="spinner"></div>
+                            <p>Preparando resumen de configuración...</p>
+                        </div>
+                        <div id="summary-content" style="display: none;"></div>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>Importante:</strong> Una vez completada la instalación, el sistema estará listo para usar y no podrás modificar esta configuración básica desde este asistente.
+                    </div>
+
+                    <div id="installation-progress" style="display: none;">
+                        <h3>Progreso de Instalación</h3>
+                        <div class="loading active">
+                            <div class="spinner"></div>
+                            <p id="installation-status">Aplicando configuración...</p>
+                        </div>
+                    </div>
+
+                    <div id="installation-complete" style="display: none;">
+                        <div class="alert alert-info">
+                            <h3>🎉 ¡Instalación Completada!</h3>
+                            <p>Tu sistema DYSA Point Enterprise está listo para usar.</p>
+                        </div>
+                        <div class="step-actions">
+                            <a href="/admin" class="btn btn-success">Ir al Panel de Administración</a>
+                            <a href="/pos" class="btn btn-primary">Abrir Terminal POS</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de Navegación -->
+                <div class="step-actions" id="navigation-buttons">
+                    <button type="button" class="btn btn-secondary" id="btn-previous" disabled>Anterior</button>
+                    <button type="button" class="btn btn-primary" id="btn-next">Siguiente</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/config/setup-wizard.js"></script>
+</body>
+</html>
