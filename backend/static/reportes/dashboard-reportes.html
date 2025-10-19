@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DYSA Point - Dashboard de Reportes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-bg: #ecf0f1;
+            --dark-text: #2c3e50;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--light-bg) 0%, #bdc3c7 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: white !important;
+        }
+
+        .main-header {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 35px rgba(0,0,0,0.15);
+        }
+
+        .stats-card.success {
+            border-left-color: var(--success-color);
+        }
+
+        .stats-card.warning {
+            border-left-color: var(--warning-color);
+        }
+
+        .stats-card.danger {
+            border-left-color: var(--danger-color);
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--dark-text);
+            margin: 0;
+        }
+
+        .stats-label {
+            color: #7f8c8d;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .stats-icon {
+            font-size: 3rem;
+            color: var(--accent-color);
+            opacity: 0.8;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+        }
+
+        .report-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+        }
+
+        .btn-report {
+            background: linear-gradient(135deg, var(--accent-color) 0%, #2980b9 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.8rem 2rem;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-report:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+            color: white;
+        }
+
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+
+        .date-controls {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            color: var(--dark-text);
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .stats-number {
+                font-size: 2rem;
+            }
+
+            .main-header,
+            .chart-container,
+            .report-section {
+                margin: 1rem 0;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="fas fa-chart-line me-2"></i>DYSA Point - Reportes</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin"><i class="fas fa-home me-1"></i>Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/reportes"><i class="fas fa-chart-bar me-1"></i>Reportes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-1"></i>Salir</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <!-- Header Section -->
+        <div class="main-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-2"><i class="fas fa-chart-line text-primary me-3"></i>Dashboard de Reportes</h1>
+                    <p class="text-muted mb-0">Análisis completo de métricas y rendimiento del restaurante</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <button class="btn btn-report" onclick="actualizarResumen()">
+                        <i class="fas fa-sync-alt me-2"></i>Actualizar Datos
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row" id="statsContainer">
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card success">
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <h3 class="stats-number" id="totalVentas">-</h3>
+                            <p class="stats-label">Ventas del Día</p>
+                        </div>
+                        <div class="col-4 text-end">
+                            <i class="fas fa-shopping-cart stats-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card">
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <h3 class="stats-number" id="totalIngresos">-</h3>
+                            <p class="stats-label">Ingresos del Día</p>
+                        </div>
+                        <div class="col-4 text-end">
+                            <i class="fas fa-dollar-sign stats-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card warning">
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <h3 class="stats-number" id="mesasOcupadas">-</h3>
+                            <p class="stats-label">Mesas Ocupadas</p>
+                        </div>
+                        <div class="col-4 text-end">
+                            <i class="fas fa-table stats-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card danger">
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <h3 class="stats-number" id="ordenesPendientes">-</h3>
+                            <p class="stats-label">Órdenes Pendientes</p>
+                        </div>
+                        <div class="col-4 text-end">
+                            <i class="fas fa-clock stats-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Date Controls -->
+        <div class="date-controls">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h5 class="mb-3">Filtros de Fecha</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="fechaInicio" class="form-label">Fecha Inicio</label>
+                            <input type="date" class="form-control" id="fechaInicio">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="fechaFin" class="form-label">Fecha Fin</label>
+                            <input type="date" class="form-control" id="fechaFin">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <h5 class="mb-3">Acciones Rápidas</h5>
+                    <button class="btn btn-outline-primary me-2" onclick="setearFechaHoy()">Hoy</button>
+                    <button class="btn btn-outline-primary me-2" onclick="setearFechaAyer()">Ayer</button>
+                    <button class="btn btn-outline-primary me-2" onclick="setearFechaSemana()">Esta Semana</button>
+                    <button class="btn btn-outline-primary" onclick="setearFechaMes()">Este Mes</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="chart-container">
+                    <h4 class="section-title">Ventas por Día</h4>
+                    <canvas id="ventasChart"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="chart-container">
+                    <h4 class="section-title">Productos Top</h4>
+                    <canvas id="productosChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Section -->
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="report-section">
+                    <h4 class="section-title">Productos Más Vendidos</h4>
+                    <div class="loading-spinner" id="loadingProductos">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="tablaProductos">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Ingresos</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="report-section">
+                    <h4 class="section-title">Ventas por Mesa</h4>
+                    <div class="loading-spinner" id="loadingMesas">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="tablaMesas">
+                            <thead>
+                                <tr>
+                                    <th>Mesa</th>
+                                    <th>Ventas</th>
+                                    <th>Ingresos</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empleados Section -->
+        <div class="row">
+            <div class="col-12">
+                <div class="report-section">
+                    <h4 class="section-title">Rendimiento por Empleado</h4>
+                    <div class="loading-spinner" id="loadingEmpleados">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="tablaEmpleados">
+                            <thead>
+                                <tr>
+                                    <th>Empleado</th>
+                                    <th>Cargo</th>
+                                    <th>Ventas</th>
+                                    <th>Ingresos</th>
+                                    <th>Ticket Promedio</th>
+                                    <th>Tiempo Promedio</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Variables globales
+        let token = localStorage.getItem('authToken');
+        let ventasChart = null;
+        let productosChart = null;
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!token) {
+                window.location.href = '/terminal';
+                return;
+            }
+
+            setearFechaHoy();
+            inicializarCharts();
+            cargarDatos();
+        });
+
+        // Funciones de fecha
+        function setearFechaHoy() {
+            const hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('fechaInicio').value = hoy;
+            document.getElementById('fechaFin').value = hoy;
+            cargarDatos();
+        }
+
+        function setearFechaAyer() {
+            const ayer = new Date();
+            ayer.setDate(ayer.getDate() - 1);
+            const fechaAyer = ayer.toISOString().split('T')[0];
+            document.getElementById('fechaInicio').value = fechaAyer;
+            document.getElementById('fechaFin').value = fechaAyer;
+            cargarDatos();
+        }
+
+        function setearFechaSemana() {
+            const hoy = new Date();
+            const inicioSemana = new Date(hoy.setDate(hoy.getDate() - hoy.getDay()));
+            const finSemana = new Date();
+
+            document.getElementById('fechaInicio').value = inicioSemana.toISOString().split('T')[0];
+            document.getElementById('fechaFin').value = finSemana.toISOString().split('T')[0];
+            cargarDatos();
+        }
+
+        function setearFechaMes() {
+            const hoy = new Date();
+            const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+            const finMes = new Date();
+
+            document.getElementById('fechaInicio').value = inicioMes.toISOString().split('T')[0];
+            document.getElementById('fechaFin').value = finMes.toISOString().split('T')[0];
+            cargarDatos();
+        }
+
+        // API Helper
+        async function hacerRequest(endpoint, metodo = 'GET', datos = null) {
+            try {
+                const opciones = {
+                    method: metodo,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                };
+
+                if (datos) {
+                    opciones.body = JSON.stringify(datos);
+                }
+
+                const response = await fetch(endpoint, opciones);
+                const resultado = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(resultado.error || 'Error en la petición');
+                }
+
+                return resultado;
+            } catch (error) {
+                console.error('Error en request:', error);
+                throw error;
+            }
+        }
+
+        // Funciones de carga de datos
+        async function actualizarResumen() {
+            try {
+                const data = await hacerRequest('/api/reportes/resumen-del-dia');
+                const resumen = data.data;
+
+                document.getElementById('totalVentas').textContent = resumen.ventas.total_ventas;
+                document.getElementById('totalIngresos').textContent = '$' + formatearNumero(resumen.ventas.total_ingresos);
+                document.getElementById('mesasOcupadas').textContent = resumen.mesas.mesas_ocupadas;
+                document.getElementById('ordenesPendientes').textContent = resumen.cocina.ordenes_pendientes;
+
+            } catch (error) {
+                console.error('Error cargando resumen:', error);
+                mostrarError('Error cargando resumen del día');
+            }
+        }
+
+        async function cargarVentasDiarias() {
+            try {
+                const fechaInicio = document.getElementById('fechaInicio').value;
+                const fechaFin = document.getElementById('fechaFin').value;
+
+                const data = await hacerRequest(`/api/reportes/ventas-diarias?fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}`);
+                actualizarChartVentas(data.data);
+
+            } catch (error) {
+                console.error('Error cargando ventas diarias:', error);
+            }
+        }
+
+        async function cargarProductosMasVendidos() {
+            try {
+                document.getElementById('loadingProductos').style.display = 'block';
+
+                const fechaInicio = document.getElementById('fechaInicio').value;
+                const fechaFin = document.getElementById('fechaFin').value;
+
+                const data = await hacerRequest(`/api/reportes/productos-mas-vendidos?fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}&limite=10`);
+                actualizarTablaProductos(data.data);
+                actualizarChartProductos(data.data);
+
+            } catch (error) {
+                console.error('Error cargando productos:', error);
+            } finally {
+                document.getElementById('loadingProductos').style.display = 'none';
+            }
+        }
+
+        async function cargarVentasPorMesa() {
+            try {
+                document.getElementById('loadingMesas').style.display = 'block';
+
+                const fechaInicio = document.getElementById('fechaInicio').value;
+                const fechaFin = document.getElementById('fechaFin').value;
+
+                const data = await hacerRequest(`/api/reportes/ventas-por-mesa?fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}`);
+                actualizarTablaMesas(data.data);
+
+            } catch (error) {
+                console.error('Error cargando ventas por mesa:', error);
+            } finally {
+                document.getElementById('loadingMesas').style.display = 'none';
+            }
+        }
+
+        async function cargarVentasPorEmpleado() {
+            try {
+                document.getElementById('loadingEmpleados').style.display = 'block';
+
+                const fechaInicio = document.getElementById('fechaInicio').value;
+                const fechaFin = document.getElementById('fechaFin').value;
+
+                const data = await hacerRequest(`/api/reportes/ventas-por-empleado?fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}`);
+                actualizarTablaEmpleados(data.data);
+
+            } catch (error) {
+                console.error('Error cargando ventas por empleado:', error);
+            } finally {
+                document.getElementById('loadingEmpleados').style.display = 'none';
+            }
+        }
+
+        // Funciones de actualización de UI
+        function actualizarTablaProductos(productos) {
+            const tbody = document.querySelector('#tablaProductos tbody');
+            tbody.innerHTML = '';
+
+            productos.forEach(producto => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${producto.nombre}</td>
+                    <td><span class="badge bg-primary">${producto.cantidad_vendida}</span></td>
+                    <td>$${formatearNumero(producto.ingresos_totales)}</td>
+                `;
+            });
+        }
+
+        function actualizarTablaMesas(mesas) {
+            const tbody = document.querySelector('#tablaMesas tbody');
+            tbody.innerHTML = '';
+
+            mesas.forEach(mesa => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>Mesa ${mesa.numero_mesa} - ${mesa.zona || 'Sin zona'}</td>
+                    <td><span class="badge bg-success">${mesa.total_ventas}</span></td>
+                    <td>$${formatearNumero(mesa.total_ingresos)}</td>
+                `;
+            });
+        }
+
+        function actualizarTablaEmpleados(empleados) {
+            const tbody = document.querySelector('#tablaEmpleados tbody');
+            tbody.innerHTML = '';
+
+            empleados.forEach(empleado => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${empleado.nombre_completo}</td>
+                    <td><span class="badge bg-info">${empleado.cargo}</span></td>
+                    <td><span class="badge bg-success">${empleado.total_ventas}</span></td>
+                    <td>$${formatearNumero(empleado.total_ingresos)}</td>
+                    <td>$${formatearNumero(empleado.ticket_promedio)}</td>
+                    <td>${empleado.tiempo_promedio_venta} min</td>
+                `;
+            });
+        }
+
+        // Funciones de charts
+        function inicializarCharts() {
+            // Chart de ventas
+            const ctxVentas = document.getElementById('ventasChart').getContext('2d');
+            ventasChart = new Chart(ctxVentas, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Ventas Diarias',
+                        data: [],
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Chart de productos
+            const ctxProductos = document.getElementById('productosChart').getContext('2d');
+            productosChart = new Chart(ctxProductos, {
+                type: 'doughnut',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [
+                            '#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6',
+                            '#1abc9c', '#34495e', '#e67e22', '#95a5a6', '#f1c40f'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function actualizarChartVentas(ventas) {
+            const labels = ventas.map(v => v.fecha);
+            const data = ventas.map(v => v.total_ingresos);
+
+            ventasChart.data.labels = labels;
+            ventasChart.data.datasets[0].data = data;
+            ventasChart.update();
+        }
+
+        function actualizarChartProductos(productos) {
+            const labels = productos.slice(0, 5).map(p => p.nombre);
+            const data = productos.slice(0, 5).map(p => p.cantidad_vendida);
+
+            productosChart.data.labels = labels;
+            productosChart.data.datasets[0].data = data;
+            productosChart.update();
+        }
+
+        // Función principal de carga
+        async function cargarDatos() {
+            await actualizarResumen();
+            await cargarVentasDiarias();
+            await cargarProductosMasVendidos();
+            await cargarVentasPorMesa();
+            await cargarVentasPorEmpleado();
+        }
+
+        // Funciones de utilidad
+        function formatearNumero(numero) {
+            return new Intl.NumberFormat('es-CL').format(numero);
+        }
+
+        function mostrarError(mensaje) {
+            // Implementar sistema de notificaciones
+            console.error(mensaje);
+        }
+
+        // Event listeners
+        document.getElementById('fechaInicio').addEventListener('change', cargarDatos);
+        document.getElementById('fechaFin').addEventListener('change', cargarDatos);
+
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('authToken');
+            window.location.href = '/terminal';
+        });
+    </script>
+</body>
+</html>

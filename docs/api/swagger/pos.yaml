@@ -1,0 +1,330 @@
+openapi: 3.0.0
+info:
+  title: DYSA Point API
+  description: API del sistema POS para restaurante DYSA Point
+  version: 1.0.0
+  contact:
+    name: DYSA Development Team
+servers:
+  - url: http://localhost:8547/api
+    description: Servidor de desarrollo
+paths:
+  /mesas:
+    get:
+      tags:
+        - Mesas
+      summary: Obtener todas las mesas
+      description: Obtiene todas las mesas con filtros opcionales
+      parameters:
+        - in: query
+          name: zona_id
+          schema:
+            type: integer
+          description: ID de la zona
+        - in: query
+          name: estado
+          schema:
+            type: string
+            enum: [LIBRE, OCUPADA, RESERVADA, MANTENIMIENTO]
+          description: Estado de la mesa
+        - in: query
+          name: capacidad_minima
+          schema:
+            type: integer
+          description: Capacidad mínima requerida
+        - in: query
+          name: vip
+          schema:
+            type: boolean
+          description: Filtro por mesas VIP
+      responses:
+        '200':
+          description: Lista de mesas obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Mesa'
+    post:
+      tags:
+        - Mesas
+      summary: Crear nueva mesa
+      description: Crea una nueva mesa en el sistema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NuevaMesa'
+      responses:
+        '201':
+          description: Mesa creada exitosamente
+        '400':
+          description: Error en los datos proporcionados
+
+  /mesas/disponibles:
+    get:
+      tags:
+        - Mesas
+      summary: Buscar mesas disponibles
+      description: Busca mesas disponibles por capacidad
+      parameters:
+        - in: query
+          name: capacidad
+          required: true
+          schema:
+            type: integer
+          description: Capacidad requerida (obligatorio)
+        - in: query
+          name: zona
+          schema:
+            type: string
+          description: Nombre de la zona (opcional)
+      responses:
+        '200':
+          description: Mesas disponibles encontradas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Mesa'
+                  criterio_busqueda:
+                    type: object
+                  recomendacion:
+                    $ref: '#/components/schemas/Mesa'
+
+  /mesas/estadisticas:
+    get:
+      tags:
+        - Mesas
+      summary: Obtener estadísticas del sistema de mesas
+      description: Obtiene estadísticas completas del sistema de mesas
+      responses:
+        '200':
+          description: Estadísticas obtenidas exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      total_mesas:
+                        type: integer
+                      por_estado:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            estado_mesa:
+                              type: string
+                            cantidad:
+                              type: integer
+                      por_zona:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            nombre_zona:
+                              type: string
+                            total_mesas:
+                              type: integer
+                            libres:
+                              type: string
+                            ocupadas:
+                              type: string
+                      metricas:
+                        type: object
+                        properties:
+                          porcentaje_ocupacion:
+                            type: number
+                          eficiencia_rotacion:
+                            type: object
+                          alertas_sistema:
+                            type: array
+
+  /mesas/zona/{zonaId}:
+    get:
+      tags:
+        - Mesas
+      summary: Obtener mesas de una zona específica
+      description: Obtener mesas de una zona específica (compatibilidad)
+      parameters:
+        - in: path
+          name: zonaId
+          required: true
+          schema:
+            type: integer
+          description: ID de la zona
+      responses:
+        '200':
+          description: Mesas de la zona obtenidas exitosamente
+
+  /mesas/{id}:
+    get:
+      tags:
+        - Mesas
+      summary: Obtener mesa por ID
+      description: Obtiene una mesa específica por ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID de la mesa (solo números)
+      responses:
+        '200':
+          description: Mesa encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/MesaDetallada'
+        '404':
+          description: Mesa no encontrada
+
+  /mesas/{id}/historial:
+    get:
+      tags:
+        - Mesas
+      summary: Obtener historial de una mesa
+      description: Obtiene el historial de cambios de una mesa
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID de la mesa (solo números)
+        - in: query
+          name: limite
+          schema:
+            type: integer
+            default: 10
+          description: Límite de registros
+      responses:
+        '200':
+          description: Historial obtenido exitosamente
+
+  /mesas/{id}/estado:
+    put:
+      tags:
+        - Mesas
+      summary: Cambiar estado de una mesa
+      description: Cambia el estado de una mesa
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID de la mesa (solo números)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                estado_nuevo:
+                  type: string
+                  enum: [LIBRE, OCUPADA, RESERVADA, MANTENIMIENTO]
+                comensales:
+                  type: integer
+                motivo:
+                  type: string
+      responses:
+        '200':
+          description: Estado cambiado exitosamente
+
+components:
+  schemas:
+    Mesa:
+      type: object
+      properties:
+        id:
+          type: integer
+        numero_mesa:
+          type: string
+        zona_id:
+          type: integer
+        capacidad_personas:
+          type: integer
+        capacidad_maxima:
+          type: integer
+        forma_mesa:
+          type: string
+        estado_mesa:
+          type: string
+        mesa_vip:
+          type: integer
+        cerca_ventana:
+          type: integer
+        aire_libre:
+          type: integer
+        nombre_zona:
+          type: string
+
+    MesaDetallada:
+      allOf:
+        - $ref: '#/components/schemas/Mesa'
+        - type: object
+          properties:
+            tiempo_ocupacion_minutos:
+              type: integer
+            estado_color:
+              type: string
+            puede_ocupar:
+              type: boolean
+            alertas:
+              type: array
+              items:
+                type: string
+            historial_reciente:
+              type: array
+              items:
+                type: object
+
+    NuevaMesa:
+      type: object
+      required:
+        - numero_mesa
+        - zona_id
+        - capacidad_personas
+      properties:
+        numero_mesa:
+          type: string
+        zona_id:
+          type: integer
+        capacidad_personas:
+          type: integer
+        capacidad_maxima:
+          type: integer
+        forma_mesa:
+          type: string
+        mesa_vip:
+          type: integer
+        cerca_ventana:
+          type: integer
+        aire_libre:
+          type: integer

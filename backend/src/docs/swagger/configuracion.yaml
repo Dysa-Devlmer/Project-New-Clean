@@ -1,0 +1,694 @@
+openapi: 3.0.3
+info:
+  title: DYSA Point - API de Configuración
+  description: |
+    API para gestión de configuración del sistema POS DYSA Point Enterprise.
+
+    ## Características
+    - ✅ Persistencia real en base de datos MySQL
+    - ✅ Validaciones de datos de entrada
+    - ✅ Transacciones para actualizaciones
+    - ✅ Respuestas estructuradas JSON
+
+    ## Secciones de Configuración
+    - **empresa**: Información de la empresa/restaurante
+    - **fiscal**: Configuración fiscal y monetaria
+    - **operativa**: Configuración operativa (zona horaria, idiomas, etc.)
+    - **restaurante**: Configuración específica del restaurante
+    - **ventas**: Configuración de ventas, descuentos, propinas
+    - **empleados**: Configuración de recursos humanos
+    - **impresion**: Configuración de impresión y tickets
+    - **sistema**: Configuración técnica del sistema
+    - **seguridad**: Configuración de seguridad y acceso
+
+  version: 2.0.0
+  contact:
+    name: Equipo DYSA Point
+    email: dev@dysapoint.com
+  license:
+    name: Propietario
+
+servers:
+  - url: http://localhost:8547/api
+    description: Servidor de desarrollo
+  - url: http://192.168.1.100:8547/api
+    description: Servidor local de restaurante
+
+paths:
+  /configuracion/sistema/configuracion:
+    get:
+      summary: Obtener configuración completa del sistema
+      description: |
+        Obtiene toda la configuración del sistema desde múltiples tablas de la base de datos.
+        Retorna configuración estructurada por secciones.
+      tags:
+        - Configuración del Sistema
+      responses:
+        '200':
+          description: Configuración obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/ConfiguracionCompleta'
+                  message:
+                    type: string
+                    example: "Configuración del sistema obtenida correctamente"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      summary: Actualizar sección específica de configuración
+      description: |
+        Actualiza una sección específica de configuración del sistema.
+        La actualización se realiza en transacción para garantizar consistencia.
+      tags:
+        - Configuración del Sistema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - seccion
+                - configuracion
+              properties:
+                seccion:
+                  type: string
+                  enum: [empresa, fiscal, operativa, restaurante, ventas, empleados, impresion, sistema, seguridad]
+                  description: Sección de configuración a actualizar
+                  example: "fiscal"
+                configuracion:
+                  type: object
+                  description: Datos de configuración a actualizar
+                  example:
+                    monedaPrincipal: "CLP"
+                    ivaDefecto: 19
+                    simboloMoneda: "$"
+            examples:
+              fiscal:
+                summary: Actualizar configuración fiscal
+                value:
+                  seccion: "fiscal"
+                  configuracion:
+                    monedaPrincipal: "CLP"
+                    ivaDefecto: 19
+                    simboloMoneda: "$"
+              empresa:
+                summary: Actualizar datos de empresa
+                value:
+                  seccion: "empresa"
+                  configuracion:
+                    razonSocial: "DYSA Point Enterprise S.A."
+                    nombreComercial: "DYSA Point Restaurant"
+                    telefono: "+56 2 2345 6789"
+      responses:
+        '200':
+          description: Configuración actualizada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      success:
+                        type: boolean
+                        example: true
+                      message:
+                        type: string
+                        example: "Configuración de fiscal actualizada correctamente"
+                      seccion:
+                        type: string
+                        example: "fiscal"
+                      configuracion:
+                        type: object
+                        description: Configuración actualizada
+                      timestamp:
+                        type: string
+                        format: date-time
+                        example: "2025-10-19T04:43:17.339Z"
+                  message:
+                    type: string
+                    example: "Configuración de fiscal actualizada correctamente"
+        '400':
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Sección no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /configuracion/categorias/lista:
+    get:
+      summary: Obtener lista de categorías de productos
+      description: |
+        Obtiene la lista de categorías de productos activas, ordenadas por orden y nombre.
+        Incluye información de colores e iconos para la interfaz de usuario.
+      tags:
+        - Categorías
+      responses:
+        '200':
+          description: Categorías obtenidas exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      categorias:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Categoria'
+                      total:
+                        type: integer
+                        example: 8
+                      timestamp:
+                        type: string
+                        format: date-time
+                        example: "2025-10-19T04:43:08.120Z"
+                  message:
+                    type: string
+                    example: "Categorías obtenidas correctamente"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /configuracion/empresa:
+    get:
+      summary: Obtener configuración de empresa
+      description: Obtiene solo la configuración relacionada con la empresa/restaurante
+      tags:
+        - Empresa
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Configuración de empresa obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      empresa:
+                        $ref: '#/components/schemas/ConfiguracionEmpresa'
+                      timestamp:
+                        type: string
+                        format: date-time
+                  message:
+                    type: string
+                    example: "Configuración de empresa obtenida correctamente"
+        '401':
+          description: Token de acceso requerido
+        '500':
+          description: Error interno del servidor
+
+    put:
+      summary: Actualizar configuración de empresa
+      description: Actualiza únicamente la configuración de empresa
+      tags:
+        - Empresa
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfiguracionEmpresa'
+      responses:
+        '200':
+          description: Configuración de empresa actualizada exitosamente
+        '400':
+          description: Error de validación
+        '401':
+          description: Token de acceso requerido
+        '500':
+          description: Error interno del servidor
+
+  /configuracion/sistema/estado:
+    get:
+      summary: Obtener estadísticas del sistema
+      description: Obtiene estadísticas generales y estado del sistema
+      tags:
+        - Estado del Sistema
+      responses:
+        '200':
+          description: Estado del sistema obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      total_tablas:
+                        type: integer
+                        example: 43
+                      total_categorias:
+                        type: integer
+                        example: 8
+                      total_productos:
+                        type: integer
+                        example: 15
+                      timestamp:
+                        type: string
+                        format: date-time
+                  message:
+                    type: string
+                    example: "Estado del sistema obtenido correctamente"
+        '500':
+          description: Error interno del servidor
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ConfiguracionCompleta:
+      type: object
+      properties:
+        empresa:
+          $ref: '#/components/schemas/ConfiguracionEmpresa'
+        fiscal:
+          $ref: '#/components/schemas/ConfiguracionFiscal'
+        operativa:
+          $ref: '#/components/schemas/ConfiguracionOperativa'
+        restaurante:
+          $ref: '#/components/schemas/ConfiguracionRestaurante'
+        ventas:
+          $ref: '#/components/schemas/ConfiguracionVentas'
+        empleados:
+          $ref: '#/components/schemas/ConfiguracionEmpleados'
+        impresion:
+          $ref: '#/components/schemas/ConfiguracionImpresion'
+        sistema:
+          $ref: '#/components/schemas/ConfiguracionSistema'
+        seguridad:
+          $ref: '#/components/schemas/ConfiguracionSeguridad'
+        runtime:
+          $ref: '#/components/schemas/ConfiguracionRuntime'
+        metadata:
+          type: object
+          properties:
+            timestamp:
+              type: string
+              format: date-time
+            version:
+              type: string
+              example: "2.0"
+
+    ConfiguracionEmpresa:
+      type: object
+      properties:
+        razonSocial:
+          type: string
+          example: "DYSA Point Enterprise S.A."
+        nombreComercial:
+          type: string
+          example: "DYSA Point Restaurant"
+        rut:
+          type: string
+          example: "76.123.456-7"
+        direccion:
+          type: string
+          example: "Av. Providencia 1234, Santiago, Chile"
+        telefono:
+          type: string
+          example: "+56 2 2345 6789"
+        email:
+          type: string
+          format: email
+          example: "contacto@dysapoint.com"
+        sitioWeb:
+          type: string
+          format: uri
+          example: "https://www.dysapoint.com"
+        logoUrl:
+          type: string
+          example: "/static/images/logo-empresa.png"
+        giroComercial:
+          type: string
+          example: "Servicios de alimentación"
+        actividadEconomica:
+          type: string
+        comuna:
+          type: string
+          example: "Providencia"
+        ciudad:
+          type: string
+          example: "Santiago"
+        region:
+          type: string
+          example: "Región Metropolitana"
+        representanteLegal:
+          type: string
+        moneda:
+          type: string
+          example: "CLP"
+        zonaHoraria:
+          type: string
+          example: "America/Santiago"
+        idioma:
+          type: string
+          example: "es_CL"
+
+    ConfiguracionFiscal:
+      type: object
+      properties:
+        monedaPrincipal:
+          type: string
+          example: "CLP"
+        simboloMoneda:
+          type: string
+          example: "$"
+        ivaDefecto:
+          type: number
+          format: float
+          example: 19
+        serieFactura:
+          type: string
+          example: "F"
+        numeracionInicio:
+          type: integer
+          example: 1
+        formatoFactura:
+          type: string
+          example: "F{serie}-{numero:06d}"
+        decimalesMoneda:
+          type: integer
+          example: 0
+        redondeoActivo:
+          type: boolean
+          example: true
+        redondeoValor:
+          type: number
+          format: float
+          example: 0.05
+
+    ConfiguracionOperativa:
+      type: object
+      properties:
+        zonaHoraria:
+          type: string
+          example: "America/Santiago"
+        formatoFecha:
+          type: string
+          example: "DD/MM/YYYY"
+        formatoHora:
+          type: string
+          example: "HH:mm"
+        idiomaPredeterminado:
+          type: string
+          example: "es"
+        idiomasDisponibles:
+          type: array
+          items:
+            type: string
+          example: ["es", "en"]
+        monedaDecimales:
+          type: integer
+          example: 0
+
+    ConfiguracionRestaurante:
+      type: object
+      properties:
+        nombreEstablecimiento:
+          type: string
+          example: "DYSA Point Restaurant"
+        tipoRestaurante:
+          type: string
+          example: "Restaurante"
+        capacidadMaxima:
+          type: integer
+          example: 80
+        totalMesas:
+          type: integer
+          example: 20
+        mesasActivas:
+          type: integer
+          example: 18
+        bloquesCocina:
+          type: integer
+          example: 4
+        tiempoPreparacionPromedio:
+          type: integer
+          example: 15
+
+    ConfiguracionVentas:
+      type: object
+      properties:
+        ivaPorcentaje:
+          type: number
+          format: float
+          example: 19
+        permitirDescuentos:
+          type: boolean
+          example: true
+        descuentoMaximo:
+          type: number
+          format: float
+          example: 50
+        permitirPropinas:
+          type: boolean
+          example: true
+        propinaSugerida:
+          type: number
+          format: float
+          example: 10
+        redondeoActivo:
+          type: boolean
+          example: false
+        redondeoValor:
+          type: number
+          format: float
+          example: 50
+
+    ConfiguracionEmpleados:
+      type: object
+      properties:
+        totalEmpleados:
+          type: integer
+          example: 8
+        empleadosActivos:
+          type: integer
+          example: 6
+        turnosActivos:
+          type: integer
+          example: 1
+        controlHorario:
+          type: boolean
+          example: true
+        permisosAvanzados:
+          type: boolean
+          example: false
+
+    ConfiguracionImpresion:
+      type: object
+      properties:
+        imprimirLogo:
+          type: boolean
+          example: true
+        imprimirDireccion:
+          type: boolean
+          example: true
+        imprimirTelefono:
+          type: boolean
+          example: true
+        imprimirRut:
+          type: boolean
+          example: true
+        tamanoPapel:
+          type: string
+          example: "A4"
+        orientacion:
+          type: string
+          example: "portrait"
+        margenSuperior:
+          type: integer
+          example: 20
+        margenInferior:
+          type: integer
+          example: 20
+        impresoraTickets:
+          type: string
+          example: "default"
+        impresoraCocina:
+          type: string
+          example: "default"
+
+    ConfiguracionSistema:
+      type: object
+      properties:
+        version:
+          type: string
+          example: "3.0.0"
+        ambiente:
+          type: string
+          example: "production"
+        modoMantenimiento:
+          type: boolean
+          example: false
+        backupAutomatico:
+          type: boolean
+          example: true
+        backupFrecuencia:
+          type: string
+          example: "diario"
+        ultimoBackup:
+          type: string
+          format: date-time
+        debugMode:
+          type: boolean
+          example: false
+        sslActivo:
+          type: boolean
+          example: false
+
+    ConfiguracionSeguridad:
+      type: object
+      properties:
+        sesionTimeout:
+          type: integer
+          example: 480
+        intentosLoginMax:
+          type: integer
+          example: 5
+        bloqueoTemporal:
+          type: integer
+          example: 15
+        auditoriaActiva:
+          type: boolean
+          example: true
+        logsDetallados:
+          type: boolean
+          example: true
+        backupEncriptado:
+          type: boolean
+          example: false
+
+    ConfiguracionRuntime:
+      type: object
+      properties:
+        sistemaActivo:
+          type: boolean
+          example: false
+        baseDatosConectada:
+          type: boolean
+          example: false
+        servidorFuncionando:
+          type: boolean
+          example: false
+        usuariosConectados:
+          type: integer
+          example: 0
+        ventasHoy:
+          type: integer
+          example: 0
+        ingresosHoy:
+          type: number
+          format: float
+          example: 0
+        ultimaActualizacion:
+          type: string
+          format: date-time
+
+    Categoria:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: "Bebidas"
+        descripcion:
+          type: string
+          example: "Bebidas frías y calientes"
+        orden:
+          type: integer
+          example: 1
+        color:
+          type: string
+          example: "#2F80ED"
+        icono:
+          type: string
+          example: "cup"
+        activa:
+          type: boolean
+          example: true
+        fechaCreacion:
+          type: string
+          format: date-time
+        fechaActualizacion:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: "Descripción del error"
+        message:
+          type: string
+          example: "Mensaje de error detallado"
+
+tags:
+  - name: Configuración del Sistema
+    description: Gestión de configuración completa del sistema
+  - name: Categorías
+    description: Gestión de categorías de productos
+  - name: Empresa
+    description: Gestión de configuración de empresa
+  - name: Estado del Sistema
+    description: Información de estado y estadísticas del sistema

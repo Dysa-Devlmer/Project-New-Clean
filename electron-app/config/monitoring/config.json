@@ -1,0 +1,44 @@
+{
+  "intervalos": {
+    "monitoreo_general": 30,
+    "verificacion_bd": 60,
+    "revision_recursos": 120,
+    "limpieza_logs": 3600
+  },
+  "umbrales": {
+    "cpu_warning": 70,
+    "cpu_critical": 90,
+    "memoria_warning": 80,
+    "memoria_critical": 95,
+    "disco_warning": 85,
+    "disco_critical": 95,
+    "respuesta_bd_warning": 5000,
+    "respuesta_bd_critical": 10000,
+    "conexiones_bd_warning": 15,
+    "conexiones_bd_critical": 19
+  },
+  "alertas": {
+    "email_habilitado": false,
+    "webhook_habilitado": false,
+    "log_habilitado": true,
+    "cooldown_minutos": 15,
+    "escalamiento": {
+      "warning_reintento": 3,
+      "critical_inmediato": true
+    }
+  },
+  "notificaciones": {
+    "email": {
+      "smtp_host": "",
+      "smtp_port": 587,
+      "smtp_user": "",
+      "smtp_pass": "",
+      "destinatarios": []
+    },
+    "webhook": {
+      "url": "",
+      "timeout": 5000,
+      "retry_attempts": 3
+    }
+  }
+}

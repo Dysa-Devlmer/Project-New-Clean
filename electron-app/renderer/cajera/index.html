@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DYSA Point POS - Sistema Principal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Header Principal */
+        .header {
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .system-title {
+            font-size: 28px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .system-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        .header-info {
+            text-align: right;
+            font-size: 14px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #27ae60;
+            box-shadow: 0 0 10px rgba(39, 174, 96, 0.5);
+        }
+
+        /* Contenedor Principal */
+        .main-container {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+
+        /* Sidebar de Navegación */
+        .sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-section {
+            padding: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 5px;
+            color: #2c3e50;
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-text {
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .nav-badge {
+            background: #e74c3c;
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        /* Área de Contenido */
+        .content-area {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .content-view {
+            display: none;
+            height: 100%;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .content-view.active {
+            display: block;
+        }
+
+        /* Dashboard Principal */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            height: fit-content;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .card-description {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .card-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #95a5a6;
+            text-transform: uppercase;
+        }
+
+        /* Colores por módulo */
+        .ventas { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+        .productos { background: linear-gradient(135deg, #3498db, #5dade2); }
+        .clientes { background: linear-gradient(135deg, #9b59b6, #bb6bd9); }
+        .reportes { background: linear-gradient(135deg, #e67e22, #f39c12); }
+        .configuracion { background: linear-gradient(135deg, #34495e, #5d6d7e); }
+        .mesas { background: linear-gradient(135deg, #1abc9c, #48c9b0); }
+
+        /* Vista de Módulo */
+        .module-content {
+            background: white;
+            border-radius: 12px;
+            height: calc(100% - 40px);
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .module-header {
+            background: #667eea;
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .module-title {
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .module-body {
+            height: calc(100% - 80px);
+            overflow: hidden;
+        }
+
+        /* Loading States */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #ecf0f1;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 250px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Principal -->
+    <div class="header">
+        <div class="logo-section">
+            <div class="logo">🍽️</div>
+            <div>
+                <div class="system-title">DYSA Point POS</div>
+                <div class="system-subtitle">Sistema Profesional para Restaurantes</div>
+            </div>
+        </div>
+        <div class="header-info">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>Sistema Operativo</span>
+            </div>
+            <div id="currentDateTime"></div>
+            <div id="systemInfo"></div>
+        </div>
+    </div>
+
+    <!-- Contenedor Principal -->
+    <div class="main-container">
+        <!-- Sidebar de Navegación -->
+        <div class="sidebar">
+            <!-- Módulos Principales -->
+            <div class="nav-section">
+                <div class="nav-title">📊 Operaciones</div>
+                <div class="nav-item active" onclick="showView('dashboard')">
+                    <div class="nav-icon">🏠</div>
+                    <div class="nav-text">Dashboard</div>
+                </div>
+                <div class="nav-item" onclick="showView('ventas')">
+                    <div class="nav-icon">💰</div>
+                    <div class="nav-text">Punto de Venta</div>
+                    <div class="nav-badge" id="ventasPendientes">3</div>
+                </div>
+                <div class="nav-item" onclick="showView('mesas')">
+                    <div class="nav-icon">🪑</div>
+                    <div class="nav-text">Gestión de Mesas</div>
+                </div>
+                <div class="nav-item" onclick="showView('garzones')">
+                    <div class="nav-icon">👥</div>
+                    <div class="nav-text">Terminal Garzones</div>
+                </div>
+            </div>
+
+            <!-- Gestión -->
+            <div class="nav-section">
+                <div class="nav-title">⚙️ Administración</div>
+                <div class="nav-item" onclick="showView('productos')">
+                    <div class="nav-icon">🍕</div>
+                    <div class="nav-text">Productos y Menú</div>
+                </div>
+                <div class="nav-item" onclick="showView('clientes')">
+                    <div class="nav-icon">👤</div>
+                    <div class="nav-text">Clientes</div>
+                </div>
+                <div class="nav-item" onclick="showView('reportes')">
+                    <div class="nav-icon">📈</div>
+                    <div class="nav-text">Reportes</div>
+                </div>
+                <div class="nav-item" onclick="showView('configuracion')">
+                    <div class="nav-icon">⚙️</div>
+                    <div class="nav-text">Configuración</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Área de Contenido -->
+        <div class="content-area">
+            <!-- Dashboard Principal -->
+            <div id="dashboard" class="content-view active">
+                <div class="dashboard">
+                    <!-- Card Ventas -->
+                    <div class="dashboard-card" onclick="showView('ventas')">
+                        <div class="card-header">
+                            <div class="card-icon ventas">💰</div>
+                            <div>
+                                <div class="card-title">Punto de Venta</div>
+                                <div class="card-description">Procesar ventas y pagos</div>
+                            </div>
+                        </div>
+                        <div class="card-stats">
+                            <div>
+                                <div class="stat-value" id="ventasHoy">$0</div>
+                                <div class="stat-label">Ventas Hoy</div>
+                            </div>
+                            <div>
+                                <div class="stat-value" id="ordenesHoy">0</div>
+                                <div class="stat-label">Órdenes</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Mesas -->
+                    <div class="dashboard-card" onclick="showView('mesas')">
+                        <div class="card-header">
+                            <div class="card-icon mesas">🪑</div>
+                            <div>
+                                <div class="card-title">Gestión de Mesas</div>
+                                <div class="card-description">Estado y control de mesas</div>
+                            </div>
+                        </div>
+                        <div class="card-stats">
+                            <div>
+                                <div class="stat-value" id="mesasOcupadas">0</div>
+                                <div class="stat-label">Ocupadas</div>
+                            </div>
+                            <div>
+                                <div class="stat-value" id="mesasLibres">0</div>
+                                <div class="stat-label">Libres</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Productos -->
+                    <div class="dashboard-card" onclick="showView('productos')">
+                        <div class="card-header">
+                            <div class="card-icon productos">🍕</div>
+                            <div>
+                                <div class="card-title">Productos y Menú</div>
+                                <div class="card-description">Gestionar carta y precios</div>
+                            </div>
+                        </div>
+                        <div class="card-stats">
+                            <div>
+                                <div class="stat-value" id="totalProductos">0</div>
+                                <div class="stat-label">Productos</div>
+                            </div>
+                            <div>
+                                <div class="stat-value" id="categorias">0</div>
+                                <div class="stat-label">Categorías</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Clientes -->
+                    <div class="dashboard-card" onclick="showView('clientes')">
+                        <div class="card-header">
+                            <div class="card-icon clientes">👤</div>
+                            <div>
+                                <div class="card-title">Clientes</div>
+                                <div class="card-description">Base de datos de clientes</div>
+                            </div>
+                        </div>
+                        <div class="card-stats">
+                            <div>
+                                <div class="stat-value" id="totalClientes">0</div>
+                                <div class="stat-label">Registrados</div>
+                            </div>
+                            <div>
+                                <div class="stat-value" id="clientesVIP">0</div>
+                                <div class="stat-label">VIP</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Reportes -->
+                    <div class="dashboard-card" onclick="showView('reportes')">
+                        <div class="card-header">
+                            <div class="card-icon reportes">📈</div>
+                            <div>
+                                <div class="card-title">Reportes</div>
+                                <div class="card-description">Análisis y estadísticas</div>
+                            </div>
+                        </div>
+                        <div class="card-stats">
+                            <div>
+                                <div class="stat-value" id="promedioVenta">$0</div>
+                                <div class="stat-label">Promedio</div>
+                            </div>
+                            <div>
+                                <div class="stat-value" id="crecimiento">0%</div>
+                                <div class="stat-label">Crecimiento</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Configuración -->
+                    <div class="dashboard-card" onclick="showView('configuracion')">
+                        <div class="card-header">
+                            <div class="card-icon configuracion">⚙️</div>
+                            <div>
+                                <div class="card-title">Configuración</div>
+                                <div class="card-description">Ajustes del sistema</div>
+                            </div>
+                        </div>
+                        <div class="card-stats">
+                            <div>
+                                <div class="stat-value" id="version">2.0.14</div>
+                                <div class="stat-label">Versión</div>
+                            </div>
+                            <div>
+                                <div class="stat-value">✅</div>
+                                <div class="stat-label">Estado</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vista Punto de Venta -->
+            <div id="ventas" class="content-view">
+                <div class="module-content">
+                    <div class="module-header">
+                        <div class="module-title">💰 Punto de Venta</div>
+                        <button onclick="showView('dashboard')">← Volver al Dashboard</button>
+                    </div>
+                    <div class="module-body">
+                        <iframe src="" id="ventasFrame" style="width: 100%; height: 100%; border: none;"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vista Mesas -->
+            <div id="mesas" class="content-view">
+                <div class="module-content">
+                    <div class="module-header">
+                        <div class="module-title">🪑 Gestión de Mesas</div>
+                        <button onclick="showView('dashboard')">← Volver al Dashboard</button>
+                    </div>
+                    <div class="module-body">
+                        <iframe src="" id="mesasFrame" style="width: 100%; height: 100%; border: none;"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vista Garzones -->
+            <div id="garzones" class="content-view">
+                <div class="module-content">
+                    <div class="module-header">
+                        <div class="module-title">👥 Terminal de Garzones</div>
+                        <button onclick="showView('dashboard')">← Volver al Dashboard</button>
+                    </div>
+                    <div class="module-body">
+                        <iframe src="" id="garzonesFrame" style="width: 100%; height: 100%; border: none;"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vista Productos -->
+            <div id="productos" class="content-view">
+                <div class="module-content">
+                    <div class="module-header">
+                        <div class="module-title">🍕 Productos y Menú</div>
+                        <button onclick="showView('dashboard')">← Volver al Dashboard</button>
+                    </div>
+                    <div class="module-body">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <div>Cargando gestión de productos...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vista Clientes -->
+            <div id="clientes" class="content-view">
+                <div class="module-content">
+                    <div class="module-header">
+                        <div class="module-title">👤 Gestión de Clientes</div>
+                        <button onclick="showView('dashboard')">← Volver al Dashboard</button>
+                    </div>
+                    <div class="module-body">
+                        <iframe src="" id="clientesFrame" style="width: 100%; height: 100%; border: none;"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vista Reportes -->
+            <div id="reportes" class="content-view">
+                <div class="module-content">
+                    <div class="module-header">
+                        <div class="module-title">📈 Reportes y Estadísticas</div>
+                        <button onclick="showView('dashboard')">← Volver al Dashboard</button>
+                    </div>
+                    <div class="module-body">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <div>Cargando reportes...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vista Configuración -->
+            <div id="configuracion" class="content-view">
+                <div class="module-content">
+                    <div class="module-header">
+                        <div class="module-title">⚙️ Configuración del Sistema</div>
+                        <button onclick="showView('dashboard')">← Volver al Dashboard</button>
+                    </div>
+                    <div class="module-body">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <div>Cargando configuración...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado de la aplicación
+        let currentView = 'dashboard';
+        let systemStats = {};
+
+        // Inicializar aplicación
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initializeSystem();
+            startSystemMonitoring();
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+        });
+
+        // Inicializar sistema
+        async function initializeSystem() {
+            try {
+                // Obtener configuración del sistema
+                const config = await electronAPI.getAppConfig();
+                const systemInfo = await electronAPI.getSystemInfo();
+
+                // Actualizar info del sistema
+                document.getElementById('systemInfo').textContent =
+                    `v${config.version} | ${systemInfo.hostname}`;
+
+                // Cargar estadísticas iniciales
+                await loadDashboardStats();
+
+                console.log('✅ Sistema DYSA Point inicializado');
+            } catch (error) {
+                console.error('❌ Error inicializando sistema:', error);
+            }
+        }
+
+        // Cargar estadísticas del dashboard
+        async function loadDashboardStats() {
+            try {
+                // Cargar estadísticas desde API
+                const mesas = await electronAPI.serverAPI.get('/mesas/estado');
+                const clientes = await electronAPI.serverAPI.get('/clientes/estadisticas/generales');
+
+                if (mesas.success) {
+                    const ocupadas = mesas.mesas.filter(m => m.estado === 'ocupada').length;
+                    const libres = mesas.mesas.filter(m => m.estado === 'libre').length;
+
+                    document.getElementById('mesasOcupadas').textContent = ocupadas;
+                    document.getElementById('mesasLibres').textContent = libres;
+                }
+
+                if (clientes.success) {
+                    const stats = clientes.data.estadisticas_generales;
+                    document.getElementById('totalClientes').textContent = stats.total_clientes;
+                    document.getElementById('clientesVIP').textContent = stats.clientes_vip;
+                }
+
+                // Estadísticas de ventas (simuladas por ahora)
+                document.getElementById('ventasHoy').textContent = '$' + (125000).toLocaleString('es-CL');
+                document.getElementById('ordenesHoy').textContent = '23';
+                document.getElementById('totalProductos').textContent = '45';
+                document.getElementById('categorias').textContent = '8';
+                document.getElementById('promedioVenta').textContent = '$5,435';
+                document.getElementById('crecimiento').textContent = '+12%';
+
+            } catch (error) {
+                console.error('Error cargando estadísticas:', error);
+            }
+        }
+
+        // Mostrar vista específica
+        function showView(viewName) {
+            // Ocultar todas las vistas
+            document.querySelectorAll('.content-view').forEach(view => {
+                view.classList.remove('active');
+            });
+
+            // Remover clase activa de navegación
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Mostrar vista seleccionada
+            document.getElementById(viewName).classList.add('active');
+
+            // Marcar item de navegación como activo
+            const navItem = document.querySelector(`[onclick="showView('${viewName}')"]`);
+            if (navItem) {
+                navItem.classList.add('active');
+            }
+
+            // Cargar contenido específico de la vista
+            loadViewContent(viewName);
+
+            currentView = viewName;
+        }
+
+        // Cargar contenido de vista específica
+        function loadViewContent(viewName) {
+            switch(viewName) {
+                case 'ventas':
+                    // Cargar interfaz de ventas integrada
+                    loadVentasInterface();
+                    break;
+
+                case 'mesas':
+                    // Cargar interfaz de mesas integrada
+                    loadMesasInterface();
+                    break;
+
+                case 'garzones':
+                    // Cargar terminal de garzones desde sistema electron
+                    document.getElementById('garzonesFrame').src = '../garzon/index.html';
+                    break;
+
+                case 'clientes':
+                    // Cargar gestión de clientes desde servidor
+                    document.getElementById('clientesFrame').src = 'http://localhost:8547/admin/clientes';
+                    break;
+
+                case 'dashboard':
+                    // Recargar estadísticas
+                    loadDashboardStats();
+                    break;
+            }
+        }
+
+        // Actualizar fecha y hora
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+
+            document.getElementById('currentDateTime').textContent =
+                now.toLocaleDateString('es-CL', options);
+        }
+
+        // Monitoreo del sistema
+        function startSystemMonitoring() {
+            setInterval(async () => {
+                try {
+                    // Verificar estado del servidor
+                    const health = await electronAPI.serverAPI.get('/health');
+
+                    if (health.status === 'OK') {
+                        document.querySelector('.status-dot').style.background = '#27ae60';
+                    } else {
+                        document.querySelector('.status-dot').style.background = '#e74c3c';
+                    }
+                } catch (error) {
+                    document.querySelector('.status-dot').style.background = '#e74c3c';
+                    console.warn('Estado del servidor no disponible');
+                }
+            }, 30000); // Cada 30 segundos
+        }
+
+        // Cargar interfaz de ventas integrada
+        async function loadVentasInterface() {
+            try {
+                const ventasBody = document.querySelector('#ventas .module-body');
+                ventasBody.innerHTML = `
+                    <div style="padding: 20px;">
+                        <h3>💰 Sistema de Ventas</h3>
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <div>Cargando productos y categorías...</div>
+                        </div>
+                    </div>
+                `;
+
+                // Cargar productos y categorías desde API
+                const productos = await electronAPI.serverAPI.get('/productos');
+                const categorias = await electronAPI.serverAPI.get('/categorias');
+
+                if (productos.success && categorias.success) {
+                    let ventasHTML = `
+                        <div style="display: flex; height: 100%;">
+                            <div style="width: 300px; background: #f8f9fa; padding: 20px; border-right: 1px solid #dee2e6;">
+                                <h4>📂 Categorías</h4>
+                                <div class="categorias-list">
+                    `;
+
+                    // Mostrar categorías
+                    categorias.categorias.forEach(cat => {
+                        ventasHTML += `
+                            <div class="categoria-item" onclick="filterProductos(${cat.id})"
+                                 style="background: ${cat.color_categoria}; color: white; padding: 10px; margin: 5px 0; border-radius: 5px; cursor: pointer;">
+                                ${cat.nombre_categoria}
+                            </div>
+                        `;
+                    });
+
+                    ventasHTML += `
+                                </div>
+                            </div>
+                            <div style="flex: 1; padding: 20px;">
+                                <h4>🍽️ Productos (${productos.productos.length})</h4>
+                                <div class="productos-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+                    `;
+
+                    // Mostrar productos
+                    productos.productos.forEach(prod => {
+                        ventasHTML += `
+                            <div class="producto-card" style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer;">
+                                <h5>${prod.nombre}</h5>
+                                <p style="font-size: 12px; color: #666;">${prod.categoria}</p>
+                                <p style="color: green; font-weight: bold;">$${Number(prod.precio_venta).toLocaleString('es-CL')}</p>
+                                <small>${prod.descripcion_completa}</small>
+                            </div>
+                        `;
+                    });
+
+                    ventasHTML += `
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    ventasBody.innerHTML = ventasHTML;
+                } else {
+                    ventasBody.innerHTML = '<div style="padding: 20px;">Error cargando datos de ventas</div>';
+                }
+            } catch (error) {
+                console.error('Error cargando interfaz de ventas:', error);
+                document.querySelector('#ventas .module-body').innerHTML = '<div style="padding: 20px;">Error conectando con el servidor</div>';
+            }
+        }
+
+        // Cargar interfaz de mesas integrada
+        async function loadMesasInterface() {
+            try {
+                const mesasBody = document.querySelector('#mesas .module-body');
+                mesasBody.innerHTML = `
+                    <div style="padding: 20px;">
+                        <h3>🪑 Gestión de Mesas</h3>
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <div>Cargando estado de mesas...</div>
+                        </div>
+                    </div>
+                `;
+
+                // Cargar estado de mesas desde API
+                const mesas = await electronAPI.serverAPI.get('/mesas/estado');
+
+                if (mesas.success) {
+                    let mesasHTML = `
+                        <div style="padding: 20px;">
+                            <h3>🪑 Estado de Mesas en Tiempo Real</h3>
+                            <div class="mesas-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 20px;">
+                    `;
+
+                    // Mostrar mesas
+                    mesas.mesas.forEach(mesa => {
+                        const statusColor = mesa.estado === 'libre' ? '#27ae60' : '#e74c3c';
+                        const statusText = mesa.estado === 'libre' ? '🟢 Libre' : '🔴 Ocupada';
+
+                        mesasHTML += `
+                            <div class="mesa-card" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 4px solid ${statusColor};">
+                                <h4>${mesa.numero_mesa}</h4>
+                                <p><strong>Estado:</strong> ${statusText}</p>
+                                <p><strong>Capacidad:</strong> ${mesa.capacidad_personas} personas</p>
+                                <p><strong>Zona:</strong> ${mesa.zona_id === 1 ? 'Salón' : mesa.zona_id === 2 ? 'Terraza' : 'Bar'}</p>
+                                ${mesa.total_final ? `<p><strong>Total:</strong> $${Number(mesa.total_final).toLocaleString('es-CL')}</p>` : ''}
+                                ${mesa.nombre_camarero ? `<p><strong>Camarero:</strong> ${mesa.nombre_camarero}</p>` : ''}
+                            </div>
+                        `;
+                    });
+
+                    mesasHTML += `
+                            </div>
+                        </div>
+                    `;
+
+                    mesasBody.innerHTML = mesasHTML;
+                } else {
+                    mesasBody.innerHTML = '<div style="padding: 20px;">Error cargando estado de mesas</div>';
+                }
+            } catch (error) {
+                console.error('Error cargando interfaz de mesas:', error);
+                document.querySelector('#mesas .module-body').innerHTML = '<div style="padding: 20px;">Error conectando con el servidor</div>';
+            }
+        }
+
+        // Filtrar productos por categoría
+        function filterProductos(categoriaId) {
+            console.log('Filtrar por categoría:', categoriaId);
+            // Implementar filtro en tiempo real
+        }
+
+        // Manejar eventos del sistema
+        if (typeof electronAPI !== 'undefined') {
+            electronAPI.onAppEvent('system-update', (event, data) => {
+                console.log('Actualización del sistema:', data);
+                loadDashboardStats();
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "soporte_24_7": true,
+  "max_sesiones_simultaneas": 50,
+  "tiempo_sesion_max": 7200,
+  "escalacion_automatica": true,
+  "chat_tiempo_real": true,
+  "screen_sharing_enabled": true,
+  "diagnostico_automatico": true,
+  "base_conocimientos": true
+}

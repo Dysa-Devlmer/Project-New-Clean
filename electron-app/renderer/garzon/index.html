@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DYSA Point - Terminal Garzón</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Header Terminal */
+        .terminal-header {
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .terminal-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .terminal-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .title-text {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #27ae60;
+            box-shadow: 0 0 10px rgba(39, 174, 96, 0.5);
+        }
+
+        /* Contenido Principal */
+        .main-content {
+            height: calc(100vh - 70px);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px 20px 0 0;
+            overflow: hidden;
+            margin: 0 10px;
+        }
+
+        .content-wrapper {
+            height: 100%;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        /* Estado de Conexión */
+        .connection-panel {
+            text-align: center;
+            padding: 50px 20px;
+            display: none;
+        }
+
+        .connection-panel.active {
+            display: block;
+        }
+
+        .connection-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .connection-message {
+            font-size: 18px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .connection-details {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+
+        .reconnect-btn {
+            background: #1abc9c;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .reconnect-btn:hover {
+            background: #16a085;
+            transform: translateY(-2px);
+        }
+
+        /* Terminal POS */
+        .pos-terminal {
+            height: 100%;
+            display: none;
+            flex-direction: column;
+        }
+
+        .pos-terminal.active {
+            display: flex;
+        }
+
+        .terminal-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Loading */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #ecf0f1;
+            border-top: 5px solid #1abc9c;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 16px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        /* Error States */
+        .error-panel {
+            background: #fff5f5;
+            border: 2px solid #fed7d7;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            margin: 50px 0;
+        }
+
+        .error-icon {
+            font-size: 48px;
+            color: #e53e3e;
+            margin-bottom: 15px;
+        }
+
+        .error-title {
+            font-size: 20px;
+            color: #e53e3e;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .error-message {
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="terminal-header">
+        <div class="terminal-title">
+            <div class="terminal-icon">👥</div>
+            <div class="title-text">Terminal Garzón</div>
+        </div>
+        <div class="connection-status">
+            <div class="status-dot" id="connectionDot"></div>
+            <span id="connectionText">Conectando...</span>
+            <span id="serverInfo"></span>
+        </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="main-content">
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="spinner"></div>
+            <div class="loading-text">Conectando al servidor principal...</div>
+        </div>
+
+        <div class="content-wrapper">
+            <!-- Panel de Conexión -->
+            <div class="connection-panel" id="connectionPanel">
+                <div class="connection-icon">🔌</div>
+                <div class="connection-message">Conectando al Servidor Principal</div>
+                <div class="connection-details" id="connectionDetails">
+                    Buscando servidor DYSA Point en la red local...
+                </div>
+                <button class="reconnect-btn" onclick="reconnectToServer()">
+                    🔄 Reintentar Conexión
+                </button>
+            </div>
+
+            <!-- Terminal POS -->
+            <div class="pos-terminal" id="posTerminal">
+                <iframe
+                    id="terminalFrame"
+                    class="terminal-frame"
+                    src="">
+                </iframe>
+            </div>
+
+            <!-- Panel de Error -->
+            <div class="error-panel" id="errorPanel" style="display: none;">
+                <div class="error-icon">⚠️</div>
+                <div class="error-title">Error de Conexión</div>
+                <div class="error-message" id="errorMessage">
+                    No se pudo conectar al servidor principal. Verifique la conexión de red.
+                </div>
+                <button class="reconnect-btn" onclick="reconnectToServer()">
+                    🔄 Reintentar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado del terminal
+        let connectionAttempts = 0;
+        let maxAttempts = 5;
+        let serverURL = null;
+        let connectionInterval = null;
+
+        // Inicializar terminal
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeTerminal();
+        });
+
+        async function initializeTerminal() {
+            try {
+                console.log('🚀 Iniciando Terminal Garzón...');
+
+                // Obtener configuración del sistema
+                const config = await electronAPI.getAppConfig();
+                const systemInfo = await electronAPI.getSystemInfo();
+
+                // Actualizar información del servidor
+                document.getElementById('serverInfo').textContent =
+                    `v${config.version} | ${systemInfo.hostname}`;
+
+                // Iniciar proceso de conexión
+                await connectToServer();
+
+            } catch (error) {
+                console.error('❌ Error inicializando terminal:', error);
+                showError('Error de inicialización', error.message);
+            }
+        }
+
+        async function connectToServer() {
+            updateConnectionStatus('connecting', 'Conectando al servidor...');
+
+            try {
+                // Verificar si estamos en modo servidor (PC principal)
+                const health = await electronAPI.serverAPI.get('/health');
+
+                if (health.status === 'OK') {
+                    // Estamos en el PC principal - cargar terminal local
+                    serverURL = 'local';
+                    await loadTerminalInterface();
+                    updateConnectionStatus('connected', 'Conectado (Servidor Local)');
+                    return;
+                }
+            } catch (error) {
+                // No estamos en modo servidor - buscar servidor en red
+                await discoverNetworkServer();
+            }
+        }
+
+        async function discoverNetworkServer() {
+            updateConnectionStatus('searching', 'Buscando servidor en red...');
+
+            // IPs comunes para probar
+            const commonIPs = [
+                '192.168.1.100',
+                '192.168.1.101',
+                '192.168.1.102',
+                '192.168.0.100',
+                '192.168.0.101',
+                '10.0.0.100'
+            ];
+
+            for (let ip of commonIPs) {
+                try {
+                    const testURL = `http://${ip}:8547`;
+                    const response = await fetch(`${testURL}/health`, {
+                        method: 'GET',
+                        timeout: 3000
+                    });
+
+                    if (response.ok) {
+                        const health = await response.json();
+                        if (health.status === 'OK') {
+                            serverURL = testURL;
+                            await loadTerminalInterface();
+                            updateConnectionStatus('connected', `Conectado a ${ip}`);
+                            return;
+                        }
+                    }
+                } catch (error) {
+                    // Continuar con siguiente IP
+                    continue;
+                }
+            }
+
+            // No se encontró servidor
+            connectionAttempts++;
+            if (connectionAttempts < maxAttempts) {
+                document.getElementById('connectionDetails').textContent =
+                    `Intento ${connectionAttempts}/${maxAttempts} - Reintentando en 5 segundos...`;
+
+                setTimeout(() => connectToServer(), 5000);
+            } else {
+                updateConnectionStatus('failed', 'Conexión fallida');
+                showError(
+                    'Servidor no encontrado',
+                    'No se pudo encontrar el servidor principal en la red local. Verifique que el PC principal esté encendido y conectado a la misma red.'
+                );
+            }
+        }
+
+        async function loadTerminalInterface() {
+            try {
+                // Ocultar panels de conexión
+                document.getElementById('loadingOverlay').style.display = 'none';
+                document.getElementById('connectionPanel').classList.remove('active');
+                document.getElementById('errorPanel').style.display = 'none';
+
+                // Cargar interfaz del terminal
+                const terminalFrame = document.getElementById('terminalFrame');
+
+                if (serverURL === 'local') {
+                    // Cargar desde servidor local
+                    terminalFrame.src = 'http://localhost:8547/static/terminal/waiter-interface-v2.html';
+                } else {
+                    // Cargar desde servidor remoto
+                    terminalFrame.src = `${serverURL}/static/terminal/waiter-interface-v2.html`;
+                }
+
+                // Mostrar terminal
+                document.getElementById('posTerminal').classList.add('active');
+
+                console.log('✅ Terminal cargado exitosamente');
+
+            } catch (error) {
+                console.error('❌ Error cargando terminal:', error);
+                showError('Error de carga', 'No se pudo cargar la interfaz del terminal.');
+            }
+        }
+
+        function updateConnectionStatus(status, message) {
+            const dot = document.getElementById('connectionDot');
+            const text = document.getElementById('connectionText');
+
+            switch(status) {
+                case 'connecting':
+                case 'searching':
+                    dot.style.background = '#f39c12';
+                    dot.style.boxShadow = '0 0 10px rgba(243, 156, 18, 0.5)';
+                    break;
+                case 'connected':
+                    dot.style.background = '#27ae60';
+                    dot.style.boxShadow = '0 0 10px rgba(39, 174, 96, 0.5)';
+                    break;
+                case 'failed':
+                    dot.style.background = '#e74c3c';
+                    dot.style.boxShadow = '0 0 10px rgba(231, 76, 60, 0.5)';
+                    break;
+            }
+
+            text.textContent = message;
+        }
+
+        function showError(title, message) {
+            document.getElementById('loadingOverlay').style.display = 'none';
+            document.getElementById('connectionPanel').classList.remove('active');
+            document.getElementById('posTerminal').classList.remove('active');
+
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorPanel').style.display = 'block';
+        }
+
+        function reconnectToServer() {
+            connectionAttempts = 0;
+            document.getElementById('errorPanel').style.display = 'none';
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            setTimeout(() => {
+                connectToServer();
+            }, 1000);
+        }
+
+        // Monitoreo de conexión
+        setInterval(async () => {
+            if (serverURL && serverURL !== 'local') {
+                try {
+                    const response = await fetch(`${serverURL}/health`, { timeout: 5000 });
+                    if (!response.ok) {
+                        throw new Error('Servidor no responde');
+                    }
+                    updateConnectionStatus('connected', `Conectado a ${serverURL.split('//')[1]}`);
+                } catch (error) {
+                    updateConnectionStatus('failed', 'Conexión perdida');
+                    console.warn('Conexión al servidor perdida, reintentando...');
+                    setTimeout(() => connectToServer(), 5000);
+                }
+            }
+        }, 30000); // Cada 30 segundos
+
+        // Manejar eventos del sistema
+        if (typeof electronAPI !== 'undefined') {
+            electronAPI.onAppEvent('server-connection-lost', () => {
+                updateConnectionStatus('failed', 'Conexión perdida');
+                reconnectToServer();
+            });
+
+            electronAPI.onAppEvent('server-connection-restored', () => {
+                updateConnectionStatus('connected', 'Conexión restaurada');
+            });
+        }
+    </script>
+</body>
+</html>

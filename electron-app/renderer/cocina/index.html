@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DYSA Point - Panel Cocina</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Header Cocina */
+        .kitchen-header {
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .kitchen-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .kitchen-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .title-text h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .title-text p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .kitchen-stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        /* Main Content */
+        .kitchen-main {
+            height: calc(100vh - 80px);
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        /* Ordenes Pendientes */
+        .orders-section {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .order-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #f39c12;
+        }
+
+        .order-card.en-preparacion {
+            border-left-color: #3498db;
+        }
+
+        .order-card.listo {
+            border-left-color: #27ae60;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .order-info {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .mesa-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .tiempo-badge {
+            background: #95a5a6;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .tiempo-badge.urgente {
+            background: #e74c3c;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .producto-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .producto-item:last-child {
+            border-bottom: none;
+        }
+
+        .producto-info {
+            flex: 1;
+        }
+
+        .producto-nombre {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .producto-cantidad {
+            color: #e74c3c;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .producto-observaciones {
+            font-size: 12px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        .producto-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-estado {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-preparar {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-preparar:hover {
+            background: #2980b9;
+        }
+
+        .btn-listo {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-listo:hover {
+            background: #229954;
+        }
+
+        .btn-entregado {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-entregado:hover {
+            background: #7f8c8d;
+        }
+
+        /* Estado Indicators */
+        .estado-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .estado-pendiente {
+            background: #f39c12;
+            color: white;
+        }
+
+        .estado-preparacion {
+            background: #3498db;
+            color: white;
+        }
+
+        .estado-listo {
+            background: #27ae60;
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .kitchen-main {
+                flex-direction: column;
+                height: auto;
+                overflow-y: auto;
+            }
+
+            .orders-section {
+                height: auto;
+                max-height: 400px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            color: #7f8c8d;
+        }
+
+        .loading::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ecf0f1;
+            border-top: 2px solid #e74c3c;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.error {
+            background: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Cocina -->
+    <div class="kitchen-header">
+        <div class="kitchen-title">
+            <div class="kitchen-icon">🍳</div>
+            <div class="title-text">
+                <h1>Panel Cocina</h1>
+                <p>DYSA Point Enterprise</p>
+            </div>
+        </div>
+        <div class="kitchen-stats">
+            <div class="stat-card">
+                <div class="stat-number" id="stat-pendientes">0</div>
+                <div class="stat-label">Pendientes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="stat-preparacion">0</div>
+                <div class="stat-label">En Preparación</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="stat-listos">0</div>
+                <div class="stat-label">Listos</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="kitchen-main">
+        <!-- Órdenes Activas -->
+        <div class="orders-section">
+            <div class="section-title">
+                🔥 Órdenes Activas
+            </div>
+            <div id="orders-container">
+                <div class="loading">Cargando órdenes...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <script>
+        // Configuración
+        const API_BASE = 'http://localhost:8547/api';
+        let ordenesActivas = [];
+        let updateInterval;
+
+        // Inicializar aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🍳 Panel Cocina iniciado');
+            cargarOrdenes();
+            iniciarActualizacionAutomatica();
+        });
+
+        // Cargar órdenes desde API
+        async function cargarOrdenes() {
+            try {
+                const response = await fetch(`${API_BASE}/cocina/ordenes`);
+                const data = await response.json();
+
+                if (data.success) {
+                    ordenesActivas = data.data;
+                    actualizarEstadisticas(data.estadisticas);
+                    renderizarOrdenes();
+                } else {
+                    mostrarError('Error al cargar órdenes');
+                }
+            } catch (error) {
+                console.error('Error cargando órdenes:', error);
+                mostrarError('Error de conexión con el servidor');
+            }
+        }
+
+        // Actualizar estadísticas
+        function actualizarEstadisticas(stats) {
+            document.getElementById('stat-pendientes').textContent = stats.productos_pendientes || 0;
+            document.getElementById('stat-preparacion').textContent = stats.productos_en_preparacion || 0;
+            document.getElementById('stat-listos').textContent = stats.productos_listos || 0;
+        }
+
+        // Renderizar órdenes
+        function renderizarOrdenes() {
+            const container = document.getElementById('orders-container');
+
+            if (ordenesActivas.length === 0) {
+                container.innerHTML = '<div class="loading">No hay órdenes activas 😌</div>';
+                return;
+            }
+
+            const ordenesHTML = ordenesActivas.map(orden => {
+                const tiempoTranscurrido = orden.tiempo_transcurrido || 0;
+                const esUrgente = tiempoTranscurrido > 30;
+
+                const productosHTML = orden.productos.map(producto => `
+                    <div class="producto-item">
+                        <div class="producto-info">
+                            <div>
+                                <span class="producto-cantidad">x${producto.cantidad}</span>
+                                <span class="producto-nombre">${producto.producto_nombre}</span>
+                                <span class="estado-badge estado-${producto.estado_preparacion.toLowerCase()}">${producto.estado_preparacion}</span>
+                            </div>
+                            ${producto.observaciones ? `<div class="producto-observaciones">${producto.observaciones}</div>` : ''}
+                        </div>
+                        <div class="producto-actions">
+                            ${generarBotonesAccion(producto)}
+                        </div>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="order-info">
+                                <div class="mesa-badge">Mesa ${orden.numero_mesa}</div>
+                                <div class="tiempo-badge ${esUrgente ? 'urgente' : ''}">${tiempoTranscurrido} min</div>
+                            </div>
+                            <div style="font-size: 12px; color: #7f8c8d;">
+                                Orden #${orden.numero_venta} - ${orden.empleado_nombre}
+                            </div>
+                        </div>
+                        <div class="productos-list">
+                            ${productosHTML}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = ordenesHTML;
+        }
+
+        // Generar botones de acción según estado
+        function generarBotonesAccion(producto) {
+            switch (producto.estado_preparacion) {
+                case 'PENDIENTE':
+                    return `<button class="btn-estado btn-preparar" onclick="cambiarEstado(${producto.detalle_id}, 'EN_PREPARACION')">
+                        🔥 Preparar
+                    </button>`;
+                case 'EN_PREPARACION':
+                    return `<button class="btn-estado btn-listo" onclick="cambiarEstado(${producto.detalle_id}, 'LISTO')">
+                        ✅ Listo
+                    </button>`;
+                case 'LISTO':
+                    return `<button class="btn-estado btn-entregado" onclick="cambiarEstado(${producto.detalle_id}, 'ENTREGADO')">
+                        🚚 Entregado
+                    </button>`;
+                default:
+                    return '';
+            }
+        }
+
+        // Cambiar estado de producto
+        async function cambiarEstado(detalleId, nuevoEstado) {
+            try {
+                const response = await fetch(`${API_BASE}/cocina/detalle/${detalleId}/estado`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ nuevo_estado: nuevoEstado })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    mostrarToast(`Producto ${data.data.producto_nombre} marcado como ${nuevoEstado}`, 'success');
+                    cargarOrdenes(); // Recargar órdenes
+                } else {
+                    mostrarError('Error al actualizar estado');
+                }
+            } catch (error) {
+                console.error('Error cambiando estado:', error);
+                mostrarError('Error de conexión');
+            }
+        }
+
+        // Mostrar toast notification
+        function mostrarToast(mensaje, tipo = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${tipo === 'error' ? 'error' : ''}`;
+            toast.textContent = mensaje;
+
+            document.getElementById('toast-container').appendChild(toast);
+
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Mostrar error
+        function mostrarError(mensaje) {
+            mostrarToast(mensaje, 'error');
+        }
+
+        // Iniciar actualización automática
+        function iniciarActualizacionAutomatica() {
+            updateInterval = setInterval(() => {
+                cargarOrdenes();
+            }, 30000); // Actualizar cada 30 segundos
+        }
+
+        // Limpiar intervalos al cerrar
+        window.addEventListener('beforeunload', function() {
+            if (updateInterval) {
+                clearInterval(updateInterval);
+            }
+        });
+
+        // Atajos de teclado
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'F5') {
+                event.preventDefault();
+                cargarOrdenes();
+                mostrarToast('Órdenes actualizadas', 'success');
+            }
+        });
+    </script>
+</body>
+</html>

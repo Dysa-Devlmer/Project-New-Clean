@@ -1,0 +1,18 @@
+{
+  "name": "@dysa/shared-outbox",
+  "version": "1.0.0",
+  "description": "Sistema de cola offline para Electron",
+  "main": "outbox.js",
+  "scripts": {
+    "test": "echo \"No tests yet\""
+  },
+  "dependencies": {
+    "@dysa/shared-config": "file:../shared-config",
+    "@dysa/shared-http": "file:../shared-http"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "author": "DYSA Development Team",
+  "license": "ISC"
+}

@@ -1,0 +1,141 @@
+/**
+ * DYSA Point - Aplicación Express
+ * Configuración de la aplicación sin el servidor HTTP
+ * Fecha: 19 de Octubre 2025
+ */
+
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const path = require('path');
+require('dotenv').config();
+
+const app = express();
+
+// Middleware
+app.use(cors());
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
+
+// Servir archivos estáticos del sistema POS
+app.use('/static', express.static(path.join(__dirname, '../static')));
+
+// === RUTAS DE INTERFACES DE USUARIO ===
+
+// Terminal de Mesero
+app.get('/terminal', (req, res) => {
+    res.sendFile(path.join(__dirname, '../static/terminal/waiter-interface-v2.html'));
+});
+
+// Panel POS Principal
+app.get('/pos', (req, res) => {
+    res.sendFile(path.join(__dirname, '../static/terminal/pos-panel.html'));
+});
+
+// Panel de Cajera
+app.get('/cajera', (req, res) => {
+    res.sendFile(path.join(__dirname, '../static/cajera/dashboard-cajera.html'));
+});
+
+// Panel de Cocina
+app.get('/cocina', (req, res) => {
+    res.sendFile(path.join(__dirname, '../static/cocina/panel-cocina.html'));
+});
+
+// Panel de Administración
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, '../static/admin/dashboard-admin.html'));
+});
+
+// Gestión de Productos
+app.get('/productos', (req, res) => {
+    res.sendFile(path.join(__dirname, '../static/productos/gestion-productos.html'));
+});
+
+// Gestión de Clientes
+app.get('/clientes', (req, res) => {
+    res.sendFile(path.join(__dirname, '../static/clientes/gestion-clientes.html'));
+});
+
+// Reportes
+app.get('/reportes', (req, res) => {
+    res.sendFile(path.join(__dirname, '../static/reportes/dashboard-reportes.html'));
+});
+
+// Configuración
+app.get('/configuracion', (req, res) => {
+    res.sendFile(path.join(__dirname, '../static/configuracion/panel-configuracion.html'));
+});
+
+// Ruta principal - redirige al login del terminal
+app.get('/', (req, res) => {
+    res.redirect('/terminal');
+});
+
+// Logging de requests
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+    next();
+});
+
+// Health check
+app.get('/health', (req, res) => {
+    res.json({
+        status: 'OK',
+        message: 'DYSA Point Enterprise Backend funcionando',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development'
+    });
+});
+
+// Importar rutas
+const authRoutes = require('./routes/auth');
+const productosRoutes = require('./routes/productos');
+const ventasRoutes = require('./routes/ventas');
+const mesasRoutes = require('./routes/mesas');
+const cocinaRoutes = require('./routes/cocina');
+const clientesRoutes = require('./routes/clientes');
+const reportesRoutes = require('./routes/reportes');
+const configuracionRoutes = require('./routes/configuracion');
+const { router: eventsRoutes } = require('./routes/events');
+const ticketsRoutes = require('./routes/tickets');
+const systemConfigRoutes = require('./routes/system-config');
+
+// Montar rutas principales del POS
+app.use('/api/auth', authRoutes);
+app.use('/api/productos', productosRoutes);
+app.use('/api/ventas', ventasRoutes);
+app.use('/api/mesas', mesasRoutes);
+app.use('/api/cocina', cocinaRoutes);
+app.use('/api/clientes', clientesRoutes);
+app.use('/api/reportes', reportesRoutes);
+app.use('/api/configuracion', configuracionRoutes);
+app.use('/api/events', eventsRoutes);
+app.use('/api/pos/tickets', ticketsRoutes);
+app.use('/api/sistema', systemConfigRoutes);
+app.use('/api/setup', systemConfigRoutes);
+
+// Ruta de prueba
+app.get('/api/test', (req, res) => {
+    res.json({ message: 'API funcionando correctamente', timestamp: new Date().toISOString() });
+});
+
+// Manejo de errores 404
+app.use((req, res) => {
+    res.status(404).json({
+        success: false,
+        error: 'Ruta no encontrada'
+    });
+});
+
+// Manejo global de errores
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    res.status(500).json({
+        success: false,
+        error: 'Error interno del servidor',
+        details: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+});
+
+module.exports = app;

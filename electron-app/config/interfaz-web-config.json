@@ -1,0 +1,14 @@
+{
+  "tema": "dysa-professional",
+  "idioma": "es",
+  "zona_horaria": "America/Santiago",
+  "dashboard_refresh": 30000,
+  "metricas_tiempo_real": true,
+  "notificaciones_push": true,
+  "modo_oscuro": false,
+  "compresion_imagenes": true,
+  "cache_navegador": 3600,
+  "sesion_timeout": 28800,
+  "logs_por_pagina": 50,
+  "max_upload_size": 10485760
+}

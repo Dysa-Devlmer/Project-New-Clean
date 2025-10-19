@@ -1,0 +1,17 @@
+{
+  "servidor_actualizaciones": "https://updates.dysapoint.com",
+  "servidor_fallback": "https://updates-backup.dysapoint.com",
+  "verificar_cada_horas": 6,
+  "ventana_mantenimiento": {
+    "inicio": "02:00",
+    "fin": "05:00",
+    "zona_horaria": "America/Santiago"
+  },
+  "auto_instalar": false,
+  "backup_antes_actualizar": true,
+  "rollback_automatico": true,
+  "tiempo_espera_rollback": 300,
+  "verificar_integridad": true,
+  "notificar_actualizaciones": true,
+  "modo_silencioso": true
+}

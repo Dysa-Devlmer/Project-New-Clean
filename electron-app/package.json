@@ -1,0 +1,173 @@
+{
+  "name": "dysa-point-desktop",
+  "productName": "DYSA Point POS",
+  "version": "2.0.14",
+  "description": "Sistema POS Profesional para Restaurantes - Aplicación de Escritorio",
+  "main": "main.js",
+  "homepage": "https://dysa.cl",
+  "author": {
+    "name": "DYSA Solutions",
+    "email": "soporte@dysa.cl"
+  },
+  "license": "Commercial",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dev": "NODE_ENV=development electron .",
+    "server": "electron . --server",
+    "terminal": "electron . --terminal",
+    "build": "electron-builder --publish=never",
+    "build-server": "electron-builder --config.productName=\"DYSA Point Server\" --config.artifactName=\"dysa-point-server-setup.exe\"",
+    "build-terminal": "electron-builder --config.productName=\"DYSA Point Terminal\" --config.artifactName=\"dysa-point-terminal-setup.exe\"",
+    "build-complete": "create-complete-installer.bat",
+    "build-autocontained": "electron-builder --config electron-builder-autocontained.json",
+    "dist": "npm run build-server && npm run build-terminal",
+    "dist-complete": "npm run build-complete",
+    "pack": "electron-builder --dir",
+    "pack-complete": "electron-packager . \"DYSA Point Complete\" --platform=win32 --arch=x64 --out=dist --overwrite --asar",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "keywords": [
+    "pos",
+    "restaurant",
+    "point-of-sale",
+    "desktop",
+    "electron",
+    "dysa"
+  ],
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "axios": "^1.12.2",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "exceljs": "^4.4.0",
+    "express": "^4.18.2",
+    "express-rate-limit": "^8.1.0",
+    "https": "^1.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "marked": "^16.4.0",
+    "moment": "^2.29.4",
+    "moment-timezone": "^0.6.0",
+    "multer": "^2.0.2",
+    "mysql2": "^3.6.5",
+    "node-cron": "^3.0.3",
+    "node-forge": "^1.3.1",
+    "node-machine-id": "^1.1.12",
+    "nodemailer": "^7.0.9",
+    "pdfkit": "^0.15.0",
+    "puppeteer": "^24.24.1",
+    "redis": "^5.8.3",
+    "semver": "^7.7.3",
+    "sharp": "^0.34.4",
+    "uuid": "^9.0.1",
+    "ws": "^8.18.3",
+    "yauzl": "^3.2.0"
+  },
+  "devDependencies": {
+    "electron": "^28.1.4",
+    "electron-builder": "^24.9.1",
+    "electron-log": "^5.0.1",
+    "electron-updater": "^6.1.7"
+  },
+  "build": {
+    "appId": "cl.dysa.point",
+    "productName": "DYSA Point POS",
+    "copyright": "Copyright © 2025 DYSA Solutions",
+    "compression": "maximum",
+    "directories": {
+      "app": ".",
+      "output": "../installers"
+    },
+    "files": [
+      "**/*",
+      "!node_modules/**/*",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../backend/",
+        "to": "backend/",
+        "filter": [
+          "**/*",
+          "!node_modules/**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "${productName}-${version}-setup.${ext}",
+      "publisherName": "DYSA Solutions SpA",
+      "verifyUpdateCodeSignature": false,
+      "requestedExecutionLevel": "requireAdministrator"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "perMachine": true,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico",
+      "installerSidebar": "build/installer-sidebar.bmp",
+      "uninstallerSidebar": "build/uninstaller-sidebar.bmp",
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "DYSA Point - Sistema POS Empresarial",
+      "include": "build/installer.nsh",
+      "script": "build/restaurant-wizard.nsh",
+      "artifactName": "DYSA-Point-POS-v${version}-Installer-Professional.${ext}",
+      "deleteAppDataOnUninstall": false,
+      "displayLanguageSelector": true,
+      "installerLanguages": ["es", "en"],
+      "language": "3082",
+      "runAfterFinish": true,
+      "menuCategory": "DYSA Point\\Sistema POS Empresarial",
+      "warningsAsErrors": false,
+      "differentialPackage": false,
+      "packElevateHelper": true,
+      "preCompressedFileExtensions": [".7z", ".zip", ".rar", ".bz2", ".gz"],
+      "unicode": true,
+      "guid": "A1B2C3D4-E5F6-7890-ABCD-EFGHIJK12345",
+      "allowElevation": true,
+      "requestExecutionLevel": "requireAdministrator",
+      "multiLanguageInstaller": true,
+      "removeDefaultUninstallWelcomePage": false,
+      "removeUninstallWelcomePage": false,
+      "installerHeader": "DYSA Point v2.0.14 - Instalación Profesional",
+      "uninstallDisplayName": "DYSA Point - Sistema POS Empresarial v${version}",
+      "license": "LICENSE.txt",
+      "welcomeTitle": "¡Bienvenido a DYSA Point POS!",
+      "finishTitle": "¡DYSA Point Instalado Exitosamente!"
+    },
+    "extraMetadata": {
+      "name": "dysa-point-desktop"
+    },
+    "publish": {
+      "provider": "generic",
+      "url": "https://updates.dysa.cl/pos/"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dysa-solutions/dysa-point"
+  },
+  "bugs": {
+    "url": "https://support.dysa.cl"
+  }
+}

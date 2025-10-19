@@ -1,0 +1,25 @@
+{
+  "idiomas": [
+    "es",
+    "en",
+    "pt"
+  ],
+  "formatos": [
+    "pdf",
+    "html",
+    "markdown",
+    "word"
+  ],
+  "tipos_restaurante": [
+    "casual",
+    "fino",
+    "rapido",
+    "bar",
+    "cafeteria"
+  ],
+  "plantillas": {},
+  "cache": {},
+  "versionado": true,
+  "incluir_screenshots": true,
+  "incluir_diagramas": true
+}

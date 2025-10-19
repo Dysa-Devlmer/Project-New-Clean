@@ -1,0 +1,11 @@
+{
+  "zona_horaria": "America/Santiago",
+  "nivel_minimo": "info",
+  "rotacion_dias": 30,
+  "max_tamanio_mb": 100,
+  "archivo_automatico": true,
+  "alertas_activas": true,
+  "analisis_anomalias": true,
+  "integridad_verificacion": true,
+  "formato_logs": "json"
+}

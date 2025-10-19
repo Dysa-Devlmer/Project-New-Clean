@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DYSA Point POS - Administración</title>
+    <link rel="stylesheet" href="/web-admin/css/admin.css">
+    <link rel="icon" type="image/x-icon" href="/web-admin/img/favicon.ico">
+    <meta name="theme-color" content="#2c3e50">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1>DYSA Point</h1>
+                <div class="version">v2.0.14</div>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="nav-item">
+                    <a href="/admin/dashboard" class="nav-link active">
+                        <i>📊</i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/ventas" class="nav-link">
+                        <i>💰</i>
+                        <span>Ventas</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/mesas" class="nav-link">
+                        <i>🍽️</i>
+                        <span>Mesas</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/productos" class="nav-link">
+                        <i>🍕</i>
+                        <span>Productos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/usuarios" class="nav-link">
+                        <i>👥</i>
+                        <span>Usuarios</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/reportes" class="nav-link">
+                        <i>📈</i>
+                        <span>Reportes</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/sistema" class="nav-link">
+                        <i>⚙️</i>
+                        <span>Sistema</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/configuracion" class="nav-link">
+                        <i>🔧</i>
+                        <span>Configuración</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Contenido Principal -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="main-header">
+                <div class="header-left">
+                    <button class="sidebar-toggle">☰</button>
+                    <h1 class="page-title">Dashboard Ejecutivo</h1>
+                </div>
+                <div class="header-right">
+                    <button class="notifications-btn">
+                        🔔
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <button class="user-menu-btn">
+                        👤
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard Container -->
+            <div class="dashboard-container">
+                <!-- Widgets Grid -->
+                <div class="dashboard-grid">
+                    <!-- Widget Ventas -->
+                    <div class="widget" data-widget="ventas-tiempo-real" id="widget-ventas">
+                        <!-- Contenido dinámico -->
+                    </div>
+
+                    <!-- Widget Mesas -->
+                    <div class="widget" data-widget="mesas-estado" id="widget-mesas">
+                        <!-- Contenido dinámico -->
+                    </div>
+
+                    <!-- Widget Sistema -->
+                    <div class="widget" data-widget="sistema-salud" id="widget-sistema">
+                        <!-- Contenido dinámico -->
+                    </div>
+
+                    <!-- Widget Productos -->
+                    <div class="widget" data-widget="productos-populares" id="widget-productos">
+                        <!-- Contenido dinámico -->
+                    </div>
+                </div>
+
+                <!-- Sección de Reportes Rápidos -->
+                <div class="quick-reports">
+                    <h2>Reportes Rápidos</h2>
+                    <div class="reports-grid">
+                        <div class="report-card">
+                            <h3>Ventas del Día</h3>
+                            <div class="report-value">$127,450</div>
+                            <div class="report-change positive">+12.5%</div>
+                        </div>
+                        <div class="report-card">
+                            <h3>Mesas Atendidas</h3>
+                            <div class="report-value">47</div>
+                            <div class="report-change positive">+8.2%</div>
+                        </div>
+                        <div class="report-card">
+                            <h3>Tiempo Promedio</h3>
+                            <div class="report-value">42 min</div>
+                            <div class="report-change negative">+3.1%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+    <script src="/web-admin/js/dashboard.js"></script>
+</body>
+</html>

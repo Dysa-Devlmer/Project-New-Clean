@@ -1,0 +1,26 @@
+{
+  "key": "DYSA-0C4F-5921-3CAA-D89C",
+  "restaurant": {
+    "nombre": "Restaurante Demo DYSA",
+    "rut": "12.345.678-9",
+    "direccion": "Demo Address 123",
+    "telefono": "+56 9 1234 5678",
+    "email": "demo@dysa.cl",
+    "ciudad": "Santiago",
+    "tipo": "desarrollo"
+  },
+  "hardwareId": "d00180cab5024313",
+  "expiry": "2026-10-14T03:00:53.007Z",
+  "features": [
+    "pos_completo",
+    "backup_automatico",
+    "monitoreo_247",
+    "soporte_remoto",
+    "reportes_avanzados",
+    "multi_usuario",
+    "inventario",
+    "facturacion_electronica"
+  ],
+  "version": "2.0.14",
+  "signature": "adc53793923fbb1ac15570d5e770f752c02925309c507641bf03eff72115e60da5faa89bbc4aa5a4531507ccc63cda8fdd91bf7e7524b0cf473567567436f051"
+}

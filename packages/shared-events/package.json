@@ -1,0 +1,17 @@
+{
+  "name": "@dysa/shared-events",
+  "version": "1.0.0",
+  "description": "Cliente de eventos SSE unificado para Electron y Web",
+  "main": "eventClient.js",
+  "scripts": {
+    "test": "echo \"No tests yet\""
+  },
+  "dependencies": {
+    "@dysa/shared-config": "file:../shared-config"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "author": "DYSA Development Team",
+  "license": "ISC"
+}

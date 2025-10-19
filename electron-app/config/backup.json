@@ -1,0 +1,7 @@
+{
+  "frecuencia_horas": 6,
+  "retention_dias": 30,
+  "compresion": true,
+  "max_backups": 100,
+  "verificar_integridad": true
+}

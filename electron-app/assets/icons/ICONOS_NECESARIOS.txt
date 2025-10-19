@@ -1,0 +1,119 @@
+=================================================================
+ICONOS NECESARIOS PARA DYSA POINT DESKTOP
+=================================================================
+
+Para compilar el instalador correctamente, necesitas crear/colocar
+los siguientes archivos de iconos en esta carpeta:
+
+📁 assets/icons/
+
+ARCHIVOS REQUERIDOS:
+====================
+
+1. icon.ico
+   - Tamaño: 256x256 píxeles
+   - Formato: ICO (Windows Icon)
+   - Uso: Icono principal de la aplicación
+   - Aparece en: Barra de título, taskbar, alt+tab
+
+2. tray-icon.ico
+   - Tamaño: 16x16 píxeles (puede ser multi-size: 16x16, 32x32)
+   - Formato: ICO
+   - Uso: Icono del system tray
+   - Aparece en: Bandeja del sistema (abajo a la derecha)
+
+3. installer.ico
+   - Tamaño: 256x256 píxeles
+   - Formato: ICO
+   - Uso: Icono del instalador
+   - Aparece en: Archivo .exe del instalador
+
+4. uninstaller.ico
+   - Tamaño: 256x256 píxeles
+   - Formato: ICO
+   - Uso: Icono del desinstalador
+   - Aparece en: Panel de Control > Programas
+
+5. header.bmp
+   - Tamaño: 150x57 píxeles
+   - Formato: BMP (Bitmap)
+   - Uso: Header del instalador NSIS
+   - Aparece en: Parte superior del wizard de instalación
+
+
+CÓMO CREAR LOS ICONOS:
+======================
+
+Opción 1: Usar una herramienta online
+- https://www.icoconverter.com/
+- https://converticon.com/
+
+Pasos:
+1. Tener el logo DYSA en PNG de alta calidad (512x512 mínimo)
+2. Subir a la herramienta
+3. Seleccionar tamaños: 16, 32, 48, 64, 128, 256
+4. Descargar como .ICO
+
+Opción 2: Usar Photoshop/GIMP
+1. Abrir logo DYSA
+2. Redimensionar a 256x256
+3. Guardar como > ICO (instalar plugin si es necesario)
+4. Repetir para cada tamaño/archivo
+
+Opción 3: Usar herramienta de línea de comandos
+```bash
+# Con ImageMagick instalado:
+convert logo.png -define icon:auto-resize=256,128,64,48,32,16 icon.ico
+```
+
+
+PLACEHOLDERS TEMPORALES:
+========================
+
+Si no tienes los iconos aún, puedes usar placeholders genéricos:
+1. Buscar "POS system icon" en Google Images
+2. Descargar un icono genérico
+3. Convertir a .ICO con las herramientas mencionadas
+4. Reemplazar cuando tengas los oficiales de DYSA
+
+
+RECOMENDACIONES DE DISEÑO:
+==========================
+
+- Usar los colores corporativos de DYSA
+- El icono debe verse bien en 16x16 (muy pequeño)
+- Usar formas simples y reconocibles
+- Evitar detalles finos que no se ven en tamaños pequeños
+- Probar en fondo claro y oscuro
+
+Ejemplos de buenos iconos POS:
+- Caja registradora estilizada
+- Terminal de punto de venta
+- Ticket o recibo
+- Logo DYSA simplificado
+
+
+VALIDACIÓN:
+===========
+
+Antes de compilar, verifica que:
+- Todos los archivos .ico existan
+- Los tamaños sean correctos
+- Los archivos no estén corruptos
+- Se vean bien en diferentes tamaños
+
+
+NOTA IMPORTANTE:
+================
+
+Sin estos iconos, el comando `npm run build` FALLARÁ.
+
+Si quieres probar sin iconos, puedes:
+1. Comentar las líneas de "icon" en package.json
+2. O usar iconos placeholder genéricos
+
+
+=================================================================
+Última actualización: 2025-10-11
+Autor: DYSA Solutions Development Team
+=================================================================

@@ -1,0 +1,84 @@
+{
+  "appId": "cl.dysa.point.complete",
+  "productName": "DYSA Point Complete System",
+  "copyright": "Copyright © 2025 DYSA Technologies - Complete POS Solution",
+  "compression": "maximum",
+  "directories": {
+    "app": ".",
+    "output": "../complete-installer",
+    "buildResources": "build"
+  },
+  "files": [
+    "**/*",
+    "!build/**/*",
+    "!create-complete-installer.bat",
+    "!electron-builder-autocontained.json",
+    "node_modules/**/*"
+  ],
+  "extraResources": [
+    {
+      "from": "build/embedded/",
+      "to": "embedded/",
+      "filter": ["**/*"]
+    },
+    {
+      "from": "server/",
+      "to": "server/",
+      "filter": ["**/*"]
+    },
+    {
+      "from": "renderer/",
+      "to": "renderer/",
+      "filter": ["**/*"]
+    }
+  ],
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "build/icon.ico",
+    "artifactName": "DYSA-Point-Complete-v${version}-${arch}.${ext}",
+    "publisherName": "DYSA Technologies SpA",
+    "requestedExecutionLevel": "requireAdministrator",
+    "verifyUpdateCodeSignature": false
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "allowElevation": true,
+    "perMachine": true,
+    "installerIcon": "build/icon.ico",
+    "uninstallerIcon": "build/icon.ico",
+    "installerHeaderIcon": "build/icon.ico",
+    "createDesktopShortcut": "always",
+    "createStartMenuShortcut": true,
+    "shortcutName": "DYSA Point - Sistema POS Completo",
+    "include": "build/self-contained-installer.nsh",
+    "artifactName": "DYSA-Point-Complete-Installer-v${version}.${ext}",
+    "deleteAppDataOnUninstall": false,
+    "displayLanguageSelector": true,
+    "installerLanguages": ["es", "en"],
+    "language": "3082",
+    "runAfterFinish": true,
+    "menuCategory": "DYSA Point\\Sistema POS Completo",
+    "warningsAsErrors": false,
+    "differentialPackage": false,
+    "packElevateHelper": true,
+    "unicode": true,
+    "allowElevation": true,
+    "requestExecutionLevel": "requireAdministrator",
+    "multiLanguageInstaller": true,
+    "installerHeader": "DYSA Point Complete - Instalación Todo-en-Uno",
+    "uninstallDisplayName": "DYSA Point Sistema POS Completo v${version}",
+    "license": "build/embedded_license.txt",
+    "welcomeTitle": "¡Bienvenido al Sistema POS más Completo!",
+    "finishTitle": "¡DYSA Point Instalado y Listo para Usar!"
+  },
+  "publish": {
+    "provider": "generic",
+    "url": "https://releases.dysa.cl/complete/"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "@dysa/shared-config",
+  "version": "1.0.0",
+  "description": "Configuración unificada para Electron y Web",
+  "main": "config.js",
+  "scripts": {
+    "test": "echo \"No tests yet\""
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "author": "DYSA Development Team",
+  "license": "ISC"
+}
