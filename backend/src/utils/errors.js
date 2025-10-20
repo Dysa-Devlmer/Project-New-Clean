@@ -81,5 +81,6 @@ module.exports = {
   DatabaseError,
   AuthenticationError,
   AuthorizationError,
-  BusinessLogicError
+  BusinessLogicError,
+  BusinessError: BusinessLogicError // Alias for compatibility
 };

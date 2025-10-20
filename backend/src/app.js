@@ -101,7 +101,8 @@ const clientesRoutes = require('./routes/clientes');
 const reportesRoutes = require('./routes/reportes');
 const configuracionRoutes = require('./routes/configuracion');
 const { router: eventsRoutes } = require('./routes/events');
-const ticketsRoutes = require('./routes/tickets');
+// const ticketsRoutes = require('./routes/tickets'); // Temporalmente deshabilitado
+const ticketsSimpleRoutes = require('./routes/tickets-simple'); // Versión funcional simplificada
 const systemConfigRoutes = require('./routes/system-config');
 
 // Montar rutas principales del POS
@@ -114,7 +115,8 @@ app.use('/api/clientes', clientesRoutes);
 app.use('/api/reportes', reportesRoutes);
 app.use('/api/configuracion', configuracionRoutes);
 app.use('/api/events', eventsRoutes);
-app.use('/api/pos/tickets', ticketsRoutes);
+// app.use('/api/pos/tickets', ticketsRoutes); // Temporalmente deshabilitado
+app.use('/api/pos/tickets', ticketsSimpleRoutes); // Versión funcional simplificada
 app.use('/api/sistema', systemConfigRoutes);
 app.use('/api/setup', systemConfigRoutes);
 

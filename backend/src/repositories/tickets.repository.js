@@ -4,7 +4,8 @@
  * Fecha: 19 de Octubre 2025
  */
 
-const db = require('../config/database');
+require('dotenv').config();
+const mysql = require('mysql2/promise');
 const { ValidationError, NotFoundError } = require('../utils/errors');
 
 class TicketsRepository {
@@ -12,13 +13,25 @@ class TicketsRepository {
     this.tableName = 'ventas_principales';
     this.detallesTableName = 'venta_detalles';
     this.pagosTableName = 'pagos_ventas';
+    this.dbConfig = {
+      host: process.env.DB_HOST || 'localhost',
+      port: Number(process.env.DB_PORT || 3306),
+      user: process.env.DB_USER || 'devlmer',
+      password: process.env.DB_PASS || 'devlmer2025',
+      database: process.env.DB_NAME || 'dysa_point',
+      charset: 'utf8mb4'
+    };
+  }
+
+  async getConnection() {
+    return await mysql.createConnection(this.dbConfig);
   }
 
   /**
    * Crear nuevo ticket/venta
    */
   async create(ticketData) {
-    const connection = await db.getConnection();
+    const connection = await this.getConnection();
 
     try {
       await connection.beginTransaction();
@@ -100,7 +113,7 @@ class TicketsRepository {
    * Buscar ticket por ID con items
    */
   async findById(id, providedConnection = null) {
-    const connection = providedConnection || await db.getConnection();
+    const connection = providedConnection || await this.getConnection();
 
     try {
       // Buscar ticket principal
@@ -197,7 +210,7 @@ class TicketsRepository {
    * Buscar tickets con filtros
    */
   async findMany(filters = {}) {
-    const connection = await db.getConnection();
+    const connection = await this.getConnection();
 
     try {
       let whereConditions = [];
@@ -289,7 +302,7 @@ class TicketsRepository {
    * Agregar item al ticket
    */
   async addItem(ticketId, itemData) {
-    const connection = await db.getConnection();
+    const connection = await this.getConnection();
 
     try {
       await connection.beginTransaction();
@@ -407,7 +420,7 @@ class TicketsRepository {
    * Actualizar item del ticket
    */
   async updateItem(ticketId, itemId, updateData) {
-    const connection = await db.getConnection();
+    const connection = await this.getConnection();
 
     try {
       await connection.beginTransaction();
@@ -529,7 +542,7 @@ class TicketsRepository {
    * Remover item del ticket
    */
   async removeItem(ticketId, itemId) {
-    const connection = await db.getConnection();
+    const connection = await this.getConnection();
 
     try {
       await connection.beginTransaction();
@@ -575,7 +588,7 @@ class TicketsRepository {
    * Recalcular totales del ticket
    */
   async recalcularTotales(ticketId, providedConnection = null) {
-    const connection = providedConnection || await db.getConnection();
+    const connection = providedConnection || await this.getConnection();
 
     try {
       // Obtener totales de items
@@ -638,7 +651,7 @@ class TicketsRepository {
    * Actualizar estado del ticket
    */
   async updateEstado(ticketId, nuevoEstado, datos = {}) {
-    const connection = await db.getConnection();
+    const connection = await this.getConnection();
 
     try {
       await connection.beginTransaction();
@@ -702,7 +715,7 @@ class TicketsRepository {
    * Obtener estadísticas de tickets
    */
   async getEstadisticas(filtros = {}) {
-    const connection = await db.getConnection();
+    const connection = await this.getConnection();
 
     try {
       const fechaHoy = new Date().toISOString().split('T')[0];
