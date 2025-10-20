@@ -38,7 +38,7 @@ async function iniciarServidor() {
             console.log('\n' + '='.repeat(60));
             console.log('🚀 SERVIDOR DYSA POINT ENTERPRISE INICIADO - PRODUCCIÓN');
             console.log('='.repeat(60));
-            console.log(`   Puerto: ${PORT}`);
+            console.log(`   Puerto: ${PORT} ← IMPORTANTE: PUERTO ACTIVO`);
             console.log(`   Ambiente: ${process.env.NODE_ENV || 'development'}`);
             console.log(`   Base de datos: ${process.env.DB_NAME || 'dysa_point'}`);
             console.log('\n📡 Acceso desde red local:');
@@ -50,6 +50,9 @@ async function iniciarServidor() {
             console.log(`   GET  /config/red - Configuración de red`);
             console.log(`   GET  /api/sistema/health - Health check extendido`);
             console.log('='.repeat(60) + '\n');
+
+            // Log específico del puerto para debug
+            console.log(`🚀 Backend escuchando en http://localhost:${PORT}`);
         });
 
         // Guardar referencia del servidor para reinicio controlado

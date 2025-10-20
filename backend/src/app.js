@@ -81,13 +81,29 @@ app.use((req, res, next) => {
     next();
 });
 
-// Health check
+// Health check endpoints (doble para compatibilidad)
 app.get('/health', (req, res) => {
     res.json({
         status: 'OK',
         message: 'DYSA Point Enterprise Backend funcionando',
         timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV || 'development'
+        environment: process.env.NODE_ENV || 'development',
+        port: process.env.PORT || 8547
+    });
+});
+
+app.get('/api/sistema/health', (req, res) => {
+    res.json({
+        status: 'OK',
+        message: 'DYSA Point Enterprise Backend funcionando',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development',
+        port: process.env.PORT || 8547,
+        data: {
+            status: 'running',
+            uptime: process.uptime(),
+            database: 'connected'
+        }
     });
 });
 
@@ -101,8 +117,8 @@ const clientesRoutes = require('./routes/clientes');
 const reportesRoutes = require('./routes/reportes');
 const configuracionRoutes = require('./routes/configuracion');
 const { router: eventsRoutes } = require('./routes/events');
-// const ticketsRoutes = require('./routes/tickets'); // Temporalmente deshabilitado
-const ticketsSimpleRoutes = require('./routes/tickets-simple'); // Versión funcional simplificada
+const ticketsRoutes = require('./routes/tickets'); // Versión real con BD
+const cajaRoutes = require('./routes/caja'); // Módulo Caja/Pagos
 const systemConfigRoutes = require('./routes/system-config');
 
 // Montar rutas principales del POS
@@ -115,8 +131,8 @@ app.use('/api/clientes', clientesRoutes);
 app.use('/api/reportes', reportesRoutes);
 app.use('/api/configuracion', configuracionRoutes);
 app.use('/api/events', eventsRoutes);
-// app.use('/api/pos/tickets', ticketsRoutes); // Temporalmente deshabilitado
-app.use('/api/pos/tickets', ticketsSimpleRoutes); // Versión funcional simplificada
+app.use('/api/pos/tickets', ticketsRoutes); // Versión real con BD
+app.use('/api/pos/caja', cajaRoutes); // Módulo Caja/Pagos
 app.use('/api/sistema', systemConfigRoutes);
 app.use('/api/setup', systemConfigRoutes);
 

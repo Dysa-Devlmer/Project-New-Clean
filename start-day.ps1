@@ -58,15 +58,18 @@ Write-Host ""
 
 Write-Host "💬 MENSAJE PARA EL AGENTE:" -ForegroundColor Magenta
 Write-Host "============================================" -ForegroundColor Magenta
-Write-Host "Perfecto. Continúa exactamente desde donde quedamos, sin repetir pasos previos," -ForegroundColor White
-Write-Host "siguiendo todas las instrucciones del PROMPT_MAESTRO.md." -ForegroundColor White
-Write-Host ""
-Write-Host "1. Migra completamente a la base de datos real (tickets.repository.js, ítems y modificadores)." -ForegroundColor White
-Write-Host "2. Elimina los archivos temporales 'simple' usados para las pruebas." -ForegroundColor White
-Write-Host "3. Implementa y prueba split/merge en tickets." -ForegroundColor White
-Write-Host "4. Inicia el módulo Caja/Pagos (Fase 3 P0) con persistencia real." -ForegroundColor White
-Write-Host "5. Guarda todo el progreso en el repositorio Dysa-Devlmer/Project-New-Clean, rama master." -ForegroundColor White
-Write-Host "6. Mantén la documentación en español en docs/reports/." -ForegroundColor White
+
+$mensaje = @"
+Perfecto. Continúa exactamente desde donde quedamos, sin repetir pasos previos,
+siguiendo todas las instrucciones del PROMPT_MAESTRO.md.
+
+1) Migrar completamente a base de datos real (tickets, ítems, modificadores).
+2) Eliminar archivos temporales 'simple' usados para las pruebas.
+3) Iniciar Fase 3 P0: Caja/Pagos with persistencia real y SSE.
+4) Documentar en docs/reports/ (español). Rama: master.
+"@
+
+Write-Host $mensaje -ForegroundColor Cyan
 Write-Host "============================================" -ForegroundColor Magenta
 Write-Host ""
 

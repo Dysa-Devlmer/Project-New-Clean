@@ -1,88 +1,167 @@
 /**
- * Script para analizar estructura de tablas de tickets/ventas
+ * Análisis de Tablas de Tickets - DYSA Point
+ * Verifica estructura y datos existentes para migración
  */
 
+require('dotenv').config();
 const mysql = require('mysql2/promise');
 
+const dbConfig = {
+  host: process.env.DB_HOST || 'localhost',
+  port: Number(process.env.DB_PORT || 3306),
+  user: process.env.DB_USER || 'devlmer',
+  password: process.env.DB_PASS || 'devlmer2025',
+  database: process.env.DB_NAME || 'dysa_point',
+  charset: 'utf8mb4'
+};
+
 async function analyzeTicketTables() {
+  let connection;
+
   try {
-    const connection = await mysql.createConnection({
-      host: process.env.DB_HOST || 'localhost',
-      port: process.env.DB_PORT || 3306,
-      user: process.env.DB_USER || 'devlmer',
-      password: process.env.DB_PASS || 'devlmer2025',
-      database: process.env.DB_NAME || 'dysa_point'
+    console.log('🔍 Conectando a base de datos...');
+    connection = await mysql.createConnection(dbConfig);
+
+    console.log('✅ Conectado exitosamente');
+    console.log('📊 Analizando tablas relacionadas con tickets...\n');
+
+    // Verificar tablas existentes
+    const [allTables] = await connection.query('SHOW TABLES');
+    const tables = allTables.filter(table => {
+      const tableName = Object.values(table)[0];
+      return tableName.includes('venta') ||
+             tableName.includes('ticket') ||
+             tableName.includes('producto') ||
+             tableName.includes('mesa');
     });
 
-    console.log('🔍 ANALIZANDO ESTRUCTURA DE TABLAS PARA TICKETS/VENTAS\n');
+    console.log('📋 TABLAS ENCONTRADAS:');
+    console.log('=====================');
+    tables.forEach((table, index) => {
+      const tableName = Object.values(table)[0];
+      console.log(`${index + 1}. ${tableName}`);
+    });
+    console.log('');
 
-    // Analizar tablas principales
-    const tablesToAnalyze = [
-      'ventas_principales',
-      'venta_detalles',
-      'productos',
-      'mesas_restaurante',
-      'categorias',
-      'formas_pago',
-      'pagos_ventas'
-    ];
-
-    for (const table of tablesToAnalyze) {
-      console.log(`\n=== TABLA: ${table.toUpperCase()} ===`);
-
-      try {
-        // Estructura de la tabla
-        const [columns] = await connection.execute(`DESCRIBE ${table}`);
-        console.log('Columnas:');
-        columns.forEach(col => {
-          console.log(`  - ${col.Field}: ${col.Type} ${col.Null === 'NO' ? 'NOT NULL' : 'NULL'} ${col.Key ? `[${col.Key}]` : ''} ${col.Default ? `DEFAULT: ${col.Default}` : ''}`);
-        });
-
-        // Datos de ejemplo
-        const [sample] = await connection.execute(`SELECT * FROM ${table} LIMIT 2`);
-        if (sample.length > 0) {
-          console.log('\nDatos ejemplo:');
-          console.log(JSON.stringify(sample, null, 2));
-        } else {
-          console.log('\nTabla vacía');
-        }
-
-      } catch (error) {
-        console.log(`❌ Error analizando ${table}: ${error.message}`);
-      }
-    }
-
-    // Verificar relaciones
-    console.log('\n=== ANÁLISIS DE RELACIONES ===');
-
+    // Analizar tabla ventas_principales
     try {
-      const [foreignKeys] = await connection.execute(`
-        SELECT
-          TABLE_NAME,
-          COLUMN_NAME,
-          CONSTRAINT_NAME,
-          REFERENCED_TABLE_NAME,
-          REFERENCED_COLUMN_NAME
-        FROM information_schema.KEY_COLUMN_USAGE
-        WHERE REFERENCED_TABLE_SCHEMA = 'dysa_point'
-        AND TABLE_NAME IN ('ventas_principales', 'venta_detalles', 'pagos_ventas')
-        ORDER BY TABLE_NAME, COLUMN_NAME
-      `);
+      console.log('🎫 ANALIZANDO: ventas_principales');
+      console.log('=================================');
 
-      foreignKeys.forEach(fk => {
-        console.log(`${fk.TABLE_NAME}.${fk.COLUMN_NAME} -> ${fk.REFERENCED_TABLE_NAME}.${fk.REFERENCED_COLUMN_NAME}`);
+      const [structure] = await connection.query('DESCRIBE ventas_principales');
+      console.log('Estructura:');
+      structure.forEach(field => {
+        console.log(`  - ${field.Field} (${field.Type}) ${field.Null === 'NO' ? 'NOT NULL' : 'NULL'} ${field.Key ? field.Key : ''}`);
       });
 
+      const [count] = await connection.query('SELECT COUNT(*) as total FROM ventas_principales');
+      console.log(`Registros: ${count[0].total}`);
+
+      if (count[0].total > 0) {
+        const [sample] = await connection.query('SELECT * FROM ventas_principales LIMIT 3');
+        console.log('Muestra de datos:');
+        sample.forEach((row, i) => {
+          console.log(`  ${i + 1}. ID:${row.id} Número:${row.numero_venta} Estado:${row.estado_venta} Total:$${row.total_final}`);
+        });
+      }
+      console.log('');
     } catch (error) {
-      console.log('❌ Error analizando foreign keys:', error.message);
+      console.log('❌ Tabla ventas_principales no existe o tiene problemas');
+      console.log(`Error: ${error.message}\n`);
     }
 
-    await connection.end();
-    console.log('\n✅ Análisis completado');
+    // Analizar tabla venta_detalles
+    try {
+      console.log('📝 ANALIZANDO: venta_detalles');
+      console.log('=============================');
+
+      const [structure] = await connection.query('DESCRIBE venta_detalles');
+      console.log('Estructura:');
+      structure.forEach(field => {
+        console.log(`  - ${field.Field} (${field.Type}) ${field.Null === 'NO' ? 'NOT NULL' : 'NULL'} ${field.Key ? field.Key : ''}`);
+      });
+
+      const [count] = await connection.query('SELECT COUNT(*) as total FROM venta_detalles');
+      console.log(`Registros: ${count[0].total}`);
+
+      if (count[0].total > 0) {
+        const [sample] = await connection.query('SELECT * FROM venta_detalles LIMIT 3');
+        console.log('Muestra de datos:');
+        sample.forEach((row, i) => {
+          console.log(`  ${i + 1}. ID:${row.id} Venta:${row.venta_id} Producto:${row.producto_id} Cantidad:${row.cantidad}`);
+        });
+      }
+      console.log('');
+    } catch (error) {
+      console.log('❌ Tabla venta_detalles no existe o tiene problemas');
+      console.log(`Error: ${error.message}\n`);
+    }
+
+    // Analizar tabla productos
+    try {
+      console.log('🍽️ ANALIZANDO: productos');
+      console.log('========================');
+
+      const [structure] = await connection.query('DESCRIBE productos');
+      console.log('Estructura:');
+      structure.forEach(field => {
+        console.log(`  - ${field.Field} (${field.Type}) ${field.Null === 'NO' ? 'NOT NULL' : 'NULL'} ${field.Key ? field.Key : ''}`);
+      });
+
+      const [count] = await connection.query('SELECT COUNT(*) as total FROM productos');
+      console.log(`Registros: ${count[0].total}`);
+
+      if (count[0].total > 0) {
+        const [sample] = await connection.query('SELECT * FROM productos LIMIT 3');
+        console.log('Muestra de datos:');
+        sample.forEach((row, i) => {
+          console.log(`  ${i + 1}. ID:${row.id} Nombre:${row.nombre_producto} Precio:$${row.precio_venta}`);
+        });
+      }
+      console.log('');
+    } catch (error) {
+      console.log('❌ Tabla productos no existe o tiene problemas');
+      console.log(`Error: ${error.message}\n`);
+    }
+
+    // Analizar tabla mesas_restaurante
+    try {
+      console.log('🪑 ANALIZANDO: mesas_restaurante');
+      console.log('===============================');
+
+      const [structure] = await connection.query('DESCRIBE mesas_restaurante');
+      console.log('Estructura:');
+      structure.forEach(field => {
+        console.log(`  - ${field.Field} (${field.Type}) ${field.Null === 'NO' ? 'NOT NULL' : 'NULL'} ${field.Key ? field.Key : ''}`);
+      });
+
+      const [count] = await connection.query('SELECT COUNT(*) as total FROM mesas_restaurante');
+      console.log(`Registros: ${count[0].total}`);
+
+      if (count[0].total > 0) {
+        const [sample] = await connection.query('SELECT * FROM mesas_restaurante LIMIT 3');
+        console.log('Muestra de datos:');
+        sample.forEach((row, i) => {
+          console.log(`  ${i + 1}. ID:${row.id} Número:${row.numero_mesa} Estado:${row.estado_mesa} Capacidad:${row.capacidad_personas}`);
+        });
+      }
+      console.log('');
+    } catch (error) {
+      console.log('❌ Tabla mesas_restaurante no existe o tiene problemas');
+      console.log(`Error: ${error.message}\n`);
+    }
+
+    console.log('✅ Análisis completado');
 
   } catch (error) {
-    console.error('❌ Error de conexión:', error.message);
+    console.error('❌ Error durante el análisis:', error.message);
+  } finally {
+    if (connection) {
+      await connection.end();
+      console.log('🔒 Conexión cerrada');
+    }
   }
 }
 
-analyzeTicketTables();
+// Ejecutar análisis
+analyzeTicketTables().catch(console.error);

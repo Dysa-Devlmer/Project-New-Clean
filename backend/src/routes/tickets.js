@@ -5,7 +5,7 @@
  */
 
 const express = require('express');
-const TicketsController = require('../controllers/tickets.controller');
+const TicketsController = require('../controllers/tickets-working.controller');
 
 const router = express.Router();
 const ticketsController = new TicketsController();

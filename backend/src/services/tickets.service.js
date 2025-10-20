@@ -4,7 +4,7 @@
  * Fecha: 19 de Octubre 2025
  */
 
-const TicketsRepository = require('../repositories/tickets.repository');
+const TicketsRepository = require('../repositories/tickets-simple.repository');
 const MesasRepository = require('../repositories/mesas.repository');
 const { ValidationError, NotFoundError, BusinessError } = require('../utils/errors');
 
